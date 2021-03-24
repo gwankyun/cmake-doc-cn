@@ -11,10 +11,10 @@ CMake教程提供了一个循序渐进的指南，涵盖了CMake帮助解决的�
 ```cmake
 cmake_minimum_required(VERSION 3.10)
 
-# set the project name
+# 设置项目名
 project(Tutorial)
 
-# add the executable
+# 添加程序
 add_executable(Tutorial tutorial.cxx)
 ```
 
@@ -24,12 +24,12 @@ add_executable(Tutorial tutorial.cxx)
 
 我们要添加的第一个特性是为我们的可执行文件和项目提供一个版本号。虽然在源码就能做到，但`CMakeLists.txt`更灵活。
 
-首先，修改`CMakeLists.txt`文件，使用[project()](https://)命令设置项目名称和版本号。
+首先，修改`CMakeLists.txt`文件，使用[project()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/project.html#command:project)命令设置项目名称和版本号。
 
 ```cmake
 cmake_minimum_required(VERSION 3.10)
 
-# set the project name and version
+# 设置项目名和版本
 project(Tutorial VERSION 1.0)
 ```
 
@@ -50,7 +50,7 @@ target_include_directories(Tutorial PUBLIC
 用你喜欢的编辑器，在源目录中创建`TutorialConfig.h.in`，内容如下:
 
 ```cpp
-// the configured options and settings for Tutorial
+// Tutorial的配置及设置项
 #define Tutorial_VERSION_MAJOR @Tutorial_VERSION_MAJOR@
 #define Tutorial_VERSION_MINOR @Tutorial_VERSION_MINOR@
 ```
@@ -63,7 +63,7 @@ target_include_directories(Tutorial PUBLIC
 
 ```cpp
   if (argc < 2) {
-    // report version
+    // 输出版本号
     std::cout << argv[0] << " Version " << Tutorial_VERSION_MAJOR << "."
               << Tutorial_VERSION_MINOR << std::endl;
     std::cout << "Usage: " << argv[0] << " number" << std::endl;
@@ -79,22 +79,22 @@ target_include_directories(Tutorial PUBLIC
 const double inputValue = std::stod(argv[1]);
 ```
 
-我们需要在CMake代码中明确声明它应该使用正确的标志。在CMake中启用对特定C++标准的支持的最简单方法是使用[CMAKE_CXX_STANDARD](https://)变量。对于本教程，将`CMakellists.tx`文件中的[CMAKE_CXX_STANDARD](https://)变量设置为11，[CMAKE_CXX_STANDARD_REQUIRED](https://)设置为True。确保`CMAKE_CXX_STANDARD`在调用`add_executable`之前声明。
+我们需要在CMake代码中明确声明它应该使用正确的标志。在CMake中启用对特定C++标准的支持的最简单方法是使用[CMAKE_CXX_STANDARD](file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_CXX_STANDARD.html#variable:CMAKE_CXX_STANDARD)变量。对于本教程，将`CMakellists.tx`文件中的[CMAKE_CXX_STANDARD](file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_CXX_STANDARD.html#variable:CMAKE_CXX_STANDARD)变量设置为11，[CMAKE_CXX_STANDARD_REQUIRED](file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_CXX_STANDARD_REQUIRED.html#variable:CMAKE_CXX_STANDARD_REQUIRED)设置为True。确保`CMAKE_CXX_STANDARD`在调用`add_executable`之前声明。
 
 ```cmake
 cmake_minimum_required(VERSION 3.10)
 
-# set the project name and version
+# 设置项目名和版本号
 project(Tutorial VERSION 1.0)
 
-# specify the C++ standard
+# 指定C++标准
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 ```
 
 ### 构建和测试
 
-运行[cmake](https://)可执行文件或[cmake-gui](https://)来配置项目，然后用你选择的构建工具构建它。
+运行[cmake](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake.1.html#manual:cmake(1))可执行文件或[cmake-gui](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-gui.1.html#manual:cmake-gui(1))来配置项目，然后用你选择的构建工具构建它。
 
 例如，我们可以从命令行导航到CMake源代码树的`Help/guide/tutorial`目录，并创建一个构建目录：
 
@@ -135,19 +135,19 @@ Tutorial
 add_library(MathFunctions mysqrt.cxx)
 ```
 
-为了使用这个新库，我们将在顶层的`CMakeLists.txt`文件中添加一个[add_subdirectory()](https://)调用，以便构建这个库。我们将新库添加到可执行文件中，并将`MathFunctions`作为包含目录添加，以便能够找到`mysqrt.h`头文件。顶层`CMakeLists.txt`文件的最后几行现在应该是这样的：
+为了使用这个新库，我们将在顶层的`CMakeLists.txt`文件中添加一个[add_subdirectory()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/add_subdirectory.html#command:add_subdirectory)调用，以便构建这个库。我们将新库添加到可执行文件中，并将`MathFunctions`作为包含目录添加，以便能够找到`mysqrt.h`头文件。顶层`CMakeLists.txt`文件的最后几行现在应该是这样的：
 
 ```cmake
-# add the MathFunctions library
+# 添加MathFunctions库
 add_subdirectory(MathFunctions)
 
-# add the executable
+# 添加可执行文件
 add_executable(Tutorial tutorial.cxx)
 
 target_link_libraries(Tutorial PUBLIC MathFunctions)
 
-# add the binary tree to the search path for include files
-# so that we will find TutorialConfig.h
+# 添加二制进目录到头文件的搜索目录中
+# 用以找到TutorialConfig.h
 target_include_directories(Tutorial PUBLIC
                           "${PROJECT_BINARY_DIR}"
                           "${PROJECT_SOURCE_DIR}/MathFunctions"
@@ -159,12 +159,12 @@ target_include_directories(Tutorial PUBLIC
 ```cmake
 option(USE_MYMATH "Use tutorial provided math implementation" ON)
 
-# configure a header file to pass some of the CMake settings
-# to the source code
+# 配置一个文件以传达一些CMake设置
+# 到源文件中
 configure_file(TutorialConfig.h.in TutorialConfig.h)
 ```
 
-这个选项将在[cmake-gui](https://)和[ccmake](https://)中显示，默认值ON可以由用户更改。该设置将存储在缓存中，这样用户在每次在构建目录上运行CMake时就不需要设置该值。
+这个选项将在[cmake-gui](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-gui.1.html#manual:cmake-gui(1))和[ccmake](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/ccmake.1.html#manual:ccmake(1))中显示，默认值ON可以由用户更改。该设置将存储在缓存中，这样用户在每次在构建目录上运行CMake时就不需要设置该值。
 
 下一个更改是使构建和链接MathFunctions库成为有条件的。为此，我们将顶层`CMakeLists.txt`文件的结尾修改为如下所示：
 
@@ -175,13 +175,13 @@ if(USE_MYMATH)
   list(APPEND EXTRA_INCLUDES "${PROJECT_SOURCE_DIR}/MathFunctions")
 endif()
 
-# add the executable
+# 添加可执行文件
 add_executable(Tutorial tutorial.cxx)
 
 target_link_libraries(Tutorial PUBLIC ${EXTRA_LIBS})
 
-# add the binary tree to the search path for include files
-# so that we will find TutorialConfig.h
+# 添加二制进目录到头文件的搜索目录中
+# 用以找到TutorialConfig.h
 target_include_directories(Tutorial PUBLIC
                            "${PROJECT_BINARY_DIR}"
                            ${EXTRA_INCLUDES}
@@ -216,9 +216,9 @@ target_include_directories(Tutorial PUBLIC
 
 **练习**：为什么在`USE_MYMATH`选项后面配置`TutorialConfig.h.in`很重要？如果我们把这两个颠倒过来会发生什么？
 
-运行[cmake](https://)可执行文件或[cmake-gui](https://)来配置项目，用你选择的构建工具构建它。然后运行Tutorial可执行文件。
+运行[cmake](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake.1.html#manual:cmake(1))可执行文件或[cmake-gui](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-gui.1.html#manual:cmake-gui(1))来配置项目，用你选择的构建工具构建它。然后运行Tutorial可执行文件。
 
-现在让我们更新`USE_MYMATH`的值。最简单的方法是使用[cmake-gui](https://)或[ccmake](https://)（如果你在终端上的话）。如果你想从命令行更改选项，试试：
+现在让我们更新`USE_MYMATH`的值。最简单的方法是使用[cmake-gui](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-gui.1.html#manual:cmake-gui(1))或[ccmake](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/ccmake.1.html#manual:ccmake(1))（如果你在终端上的话）。如果你想从命令行更改选项，试试：
 
 ```shell
 cmake ../Step2 -DUSE_MYMATH=OFF
@@ -232,12 +232,12 @@ cmake ../Step2 -DUSE_MYMATH=OFF
 
 使用需求允许对库或可执行文件的链接和include行进行更好的控制，同时也允许对CMake内部目标的传递属性进行更多的控制。利用使用需求的主要命令是：
 
-- [target_compile_definitions()](https://)
-- [target_compile_options()](https://)
-- [target_include_directories()](https://)
-- [target_link_libraries()](https://)
+- [target_compile_definitions()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/target_compile_definitions.html#command:target_compile_definitions)
+- [target_compile_options()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/target_compile_options.html#command:target_compile_options)
+- [target_include_directories()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/target_include_directories.html#command:target_include_directories)
+- [target_link_libraries()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/target_link_libraries.html#command:target_link_libraries)
 
-让我们从[添加库（第二步）](https://)开始重构代码，以使用现代的CMake方法满足使用需求。我们首先声明，任何链接到MathFunctions的人都需要包括当前的源目录，而MathFunctions本身不需要。因此，这可以成为一个`INTERFACE `使用要求。
+让我们从[添加库（第二步）](#添加库（第二步）)开始重构代码，以使用现代的CMake方法满足使用需求。我们首先声明，任何链接到MathFunctions的人都需要包括当前的源目录，而MathFunctions本身不需要。因此，这可以成为一个`INTERFACE`使用要求。
 
 请记住，`INTERFACE`指的是消费者需要但生产者不需要的东西。在`MathFunctions/CMakeLists.txt`的末尾添加以下几行：
 
@@ -264,7 +264,7 @@ target_include_directories(Tutorial PUBLIC
                            )
 ```
 
-一旦完成，运行[cmake](https://)命令或[cmake-gui](https://)来配置项目，然后用你选择的构建工具或使用`cmake --build .`在构建目录来构建它。
+一旦完成，运行[cmake](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake.1.html#manual:cmake(1))命令或[cmake-gui](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-gui.1.html#manual:cmake-gui(1))来配置项目，然后用你选择的构建工具或使用`cmake --build .`在构建目录来构建它。
 
 ## 安装和测试（第四步）
 
@@ -292,15 +292,15 @@ install(FILES "${PROJECT_BINARY_DIR}/TutorialConfig.h"
 
 这就是创建基本本地安装的全部内容。
 
-运行[cmake](https://)或者[cmake-gui](https://)来配置并用构建工具来构建它。
+运行[cmake](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake.1.html#manual:cmake(1))或者[cmake-gui](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-gui.1.html#manual:cmake-gui(1))来配置并用构建工具来构建它。
 
-接着使用[cmake](https://)命令的`install`选项（3.15版本开始，之前版本的CMake必须使用`make install`）在命令行安装。对于多配置的工具，记得用`--config`来指定配置。若使用IDE，只需构建`INSTALL`目标。这一步将安装相应的头文件、库和可执行文件，例子：
+接着使用[cmake](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake.1.html#manual:cmake(1))命令的`install`选项（3.15版本开始，之前版本的CMake必须使用`make install`）在命令行安装。对于多配置的工具，记得用`--config`来指定配置。若使用IDE，只需构建`INSTALL`目标。这一步将安装相应的头文件、库和可执行文件，例子：
 
 ```cmake
 cmake --install .
 ```
 
-`CMAKE_INSTALL_PREFIX`变量用于指定安装目录。在运行`cmake --install`命令的时候，会被`--prefix`参数覆盖。例如：
+[CMAKE_INSTALL_PREFIX](file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_INSTALL_PREFIX.html#variable:CMAKE_INSTALL_PREFIX)变量用于指定安装目录。在运行`cmake --install`命令的时候，会被`--prefix`参数覆盖。例如：
 
 ```cmake
 cmake --install . --prefix "/home/myuser/installdir"
@@ -344,7 +344,7 @@ do_test(Tutorial 0.0001 "0.0001 is 0.01")
 
 第一个测试只是验证程序能否运行，是否出现段错误或者崩溃，返回值是否为0。这就是基本的CMake测试。
 
-下一个测试使用[PASS_REGULAR_EXPRESSION](https://)测试属性来验证测试输出是否包含某些字符串。这个例子中，验证当提供的参数数量不正确时，是否输出相关信息。最后，有一个`do_test`函数，它运行程序并验证计算出来的平方根对于给定的输入是否正确。对于每次调用`do_test`，都会将另一个测试添加到项目中，并通过的参数传递名称、输入及预期结果。
+下一个测试使用[PASS_REGULAR_EXPRESSION](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_test/PASS_REGULAR_EXPRESSION.html#prop_test:PASS_REGULAR_EXPRESSION)测试属性来验证测试输出是否包含某些字符串。这个例子中，验证当提供的参数数量不正确时，是否输出相关信息。最后，有一个`do_test`函数，它运行程序并验证计算出来的平方根对于给定的输入是否正确。对于每次调用`do_test`，都会将另一个测试添加到项目中，并通过的参数传递名称、输入及预期结果。
 
 重新构建程序并进入程序目录，运行`ctest`命令：`ctest -N`和`ctest -VV`。对于多配置生成器（例如Visual Studio），必须指定配置类型。例如，要在调试模式下运行测试，可以在构建目录（而不是Debug目录）中进行`ctest -C Debug -VV`。或者，从IDE构建`RUN_TESTS`目标。
 
