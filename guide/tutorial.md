@@ -346,13 +346,13 @@ do_test(Tutorial 0.0001 "0.0001 is 0.01")
 
 下一个测试使用[PASS_REGULAR_EXPRESSION](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_test/PASS_REGULAR_EXPRESSION.html#prop_test:PASS_REGULAR_EXPRESSION)测试属性来验证测试输出是否包含某些字符串。这个例子中，验证当提供的参数数量不正确时，是否输出相关信息。最后，有一个`do_test`函数，它运行程序并验证计算出来的平方根对于给定的输入是否正确。对于每次调用`do_test`，都会将另一个测试添加到项目中，并通过的参数传递名称、输入及预期结果。
 
-重新构建程序并进入程序目录，运行`ctest`命令：`ctest -N`和`ctest -VV`。对于多配置生成器（例如Visual Studio），必须指定配置类型。例如，要在调试模式下运行测试，可以在构建目录（而不是Debug目录）中进行`ctest -C Debug -VV`。或者，从IDE构建`RUN_TESTS`目标。
+重新构建程序并进入程序目录，运行[ctest](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/ctest.1.html#manual:ctest(1))命令：`ctest -N`和`ctest -VV`。对于多配置生成器（例如Visual Studio），必须指定配置类型。例如，要在调试模式下运行测试，可以在构建目录（而不是Debug目录）中进行`ctest -C Debug -VV`。或者，从IDE构建`RUN_TESTS`目标。
 
 ## 添加系统自省（第五步）
 
 考虑向项目中添加一些依赖目标平台可能没有的特性代码。对于本例，我们将添加一些代码，这将取决于目标平台是否有`log`和`exp`函數。当然，几乎每个平台都有这些函数，但本教程假设它们并不常见。
 
-如果平台有`log`和`exp`，那么我们将使用它们在`mysqrt`中计算平方根。首先在`MathFunctions/CMakeLists.txt`中使用`CheckSymbolExists`模块判断这些函数是否可用。在一些平台上，需要链接到m库。如果`log`和`exp`不可用，使用m库并重试。
+如果平台有`log`和`exp`，那么我们将使用它们在`mysqrt`中计算平方根。首先在`MathFunctions/CMakeLists.txt`中使用[CheckSymbolExists](file:///C:/Program%20Files/CMake/doc/cmake/html/module/CheckSymbolExists.html#module:CheckSymbolExists)模块判断这些函数是否可用。在一些平台上，需要链接到m库。如果`log`和`exp`不可用，使用m库并重试。
 
 ```cmake
 include(CheckSymbolExists)
@@ -370,7 +370,7 @@ if(NOT (HAVE_LOG AND HAVE_EXP))
 endif()
 ```
 
-如果可以的话，使用[target_compile_definitions()](https://)指定`HAVE_LOG`和`HAVE_EXP`为`PRIVATE`编译器定义。
+如果可以的话，使用[target_compile_definitions()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/target_compile_definitions.html#command:target_compile_definitions)指定`HAVE_LOG`和`HAVE_EXP`为`PRIVATE`编译器定义。
 
 ```cmake
 if(HAVE_LOG AND HAVE_EXP)
@@ -396,7 +396,7 @@ endif()
 #include <cmath>
 ```
 
-运行[cmake](https://)命令或者[cmake-gui](https://)来配置并用构建工具构建它，然后运行Tutorial程序。
+运行[cmake](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake.1.html#manual:cmake(1))命令或者[cmake-gui](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-gui.1.html#manual:cmake-gui(1))来配置并用构建工具构建它，然后运行Tutorial程序。
 
 哪个函数给了更好的结果？sqrt还是mysqrt？
 
@@ -404,7 +404,7 @@ endif()
 
 假设，出于教学目的，我们决定不使用自带的`log`和`exp`函数，而希望生成一个包含预计算值的表，以便在`mysqrt`中使用。本节中，我们将创建表作为构建过程的一部分，并且将表编译到我们的程序中。
 
-首先，删除`MathFunctions/CMakeLists.txt`中对`log`和`exp`的检查。然后删除`mysqrt.cxx`中对`HAVE_LOG`和`mysqrt.cxx`的检查，与此同时可以删除`#include `。
+首先，删除`MathFunctions/CMakeLists.txt`中对`log`和`exp`的检查。然后删除`mysqrt.cxx`中对`HAVE_LOG`和`mysqrt.cxx`的检查，与此同时可以删除`#include`。
 
 `MathFunctions`目录中有一個名为`MakeTable.cxx`的源文件来提供生成表。
 
@@ -476,7 +476,7 @@ double mysqrt(double x)
 }
 ```
 
-进行[cmake](https://)或者[cmake-gui](https://)来配置并构建此项目。
+进行[cmake](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake.1.html#manual:cmake(1))或者[cmake-gui](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-gui.1.html#manual:cmake-gui(1))来配置并构建此项目。
 
 当程序构建时会先构建`MakeTable`程序。它会进行`MakeTable`产生`Table.h`。最后，它会编译包括`Table.h`的`mysqrt.cxx`以产生MathFunctions库。
 
@@ -484,7 +484,7 @@ double mysqrt(double x)
 
 ## 构建安装程序（第七步）
 
-我们下个愿望是分发工程走让别人使用它。我们想同时分发源码和二进制在不同的平台。这里我们之前讨论的第四步有一点不同，必须要在源码中编译。在此例子中，我们会构建一个安装包以支持二进制安装及包管理。为了达到这个目标我们应该使用CPack创建不同平台的安装包。应该在顶层`CMakeLists.txt`的添加一条：
+我们下个愿望是分发工程走让别人使用它。我们想同时分发源码和二进制在不同的平台。这里我们之前讨论的[安装和测试（第四步）](#安装和测试（第四步）)有一点不同，必须要在源码中编译。在此例子中，我们会构建一个安装包以支持二进制安装及包管理。为了达到这个目标我们应该使用CPack创建不同平台的安装包。应该在顶层`CMakeLists.txt`的添加一条：
 
 ```cmake
 include(InstallRequiredSystemLibraries)
@@ -494,11 +494,11 @@ set(CPACK_PACKAGE_VERSION_MINOR "${Tutorial_VERSION_MINOR}")
 include(CPack)
 ```
 
-这就是我们对它作的所有改能变。我们在开始包含[InstallRequiredSystemLibraries](https://)。这个模块会包含当前项目在当前平台下所需的运行时库。接着我们用一些CPack变量以设置当前项目的许可证及版本号。版本号在教程之前的步骤中已经设置，`license.txt`已经添加在源码目录的最高层。
+这就是我们对它作的所有改能变。我们在开始包含[InstallRequiredSystemLibraries](file:///C:/Program%20Files/CMake/doc/cmake/html/module/InstallRequiredSystemLibraries.html#module:InstallRequiredSystemLibraries)。这个模块会包含当前项目在当前平台下所需的运行时库。接着我们用一些CPack变量以设置当前项目的许可证及版本号。版本号在教程之前的步骤中已经设置，`license.txt`已经添加在源码目录的最高层。
 
-最终我们引用[CPack模块](https://)以使用这些变量或者其他属性以我于安装包。
+最终我们引用[CPack模块](file:///C:/Program%20Files/CMake/doc/cmake/html/module/CPack.html#module:CPack)以使用这些变量或者其他属性以我于安装包。
 
-下一步就是按照通常习惯构建程序并运行cpack命令。生成一个二进制包，你需要在二进制目录运行：
+下一步就是按照通常习惯构建程序并运行[cpack](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cpack.1.html#manual:cpack(1))命令。生成一个二进制包，你需要在二进制目录运行：
 
 ```shell
 cpack
