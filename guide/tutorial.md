@@ -522,7 +522,7 @@ cpack --config CPackSourceConfig.cmake
 
 ## 添加对仪表板的支持（第八步）
 
-将测试结果添加到仪表板很简单。在前面我们已经添加了一系列测试到项目中。现在我们必须运行这些测试并将结果添加到仪表板中。为与做到这点，在顶层`CMakeLists.txt`中引用`CTest`模块。
+将测试结果添加到仪表板很简单。在[测试支持](#测试支持)我们已经添加了一系列测试到项目中。现在我们必须运行这些测试并将结果添加到仪表板中。为与做到这点，在顶层`CMakeLists.txt`中引用[CTest](file:///C:/Program%20Files/CMake/doc/cmake/html/module/CTest.html#module:CTest)模块。
 
 替换：
 
@@ -538,7 +538,7 @@ enable_testing()
 include(CTest)
 ```
 
-`CTest`模块可以自动调用`enable_testing()`，所以我们可以将它将CMake文件中删掉。
+[CTest](file:///C:/Program%20Files/CMake/doc/cmake/html/module/CTest.html#module:CTest)模块可以自动调用`enable_testing()`，所以我们可以将它将CMake文件中删掉。
 
 我们同样需要创建一个`CTestConfig.cmake`文件在顶层目录以提交到仪表板。
 
@@ -552,7 +552,7 @@ set(CTEST_DROP_LOCATION "/submit.php?project=CMakeTutorial")
 set(CTEST_DROP_SITE_CDASH TRUE)
 ```
 
-[ctest](https://)命令运行时会读取此文件。你可以运行[cmake](https://)命令或者用[cmake-gui](https://)去配置这项目，但没去构建它。替代的，修改二进制树目录，并运行：
+[ctest](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/ctest.1.html#manual:ctest(1))命令运行时会读取此文件。你可以运行[cmake](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake.1.html#manual:cmake(1))命令或者用[cmake-gui](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-gui.1.html#manual:cmake-gui(1))去配置这项目，但没去构建它。替代的，修改二进制树目录，并运行：
 
 ```shell
 ctest [-VV] -C Debug -D Experimental
@@ -566,7 +566,7 @@ ctest [-VV] -C Debug -D Experimental
 
 或者直接在IDE中编译`Experimental`目标。
 
-[ctest](https://)命令将构建并将结果提交到Kitware的公共仪表板：[https://my.cdash.org/index.php?project=CMakeTutorial](https://my.cdash.org/index.php?project=CMakeTutorial)。
+[ctest](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/ctest.1.html#manual:ctest(1))命令将构建并将结果提交到Kitware的公共仪表板：[https://my.cdash.org/index.php?project=CMakeTutorial](https://my.cdash.org/index.php?project=CMakeTutorial)。
 
 ## 混合使用靜態庫和共享庫（第九步）
 
