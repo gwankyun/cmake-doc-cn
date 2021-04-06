@@ -12,11 +12,11 @@
 
 关于[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)目标的详细信息可以通过设置名称以`IMPORTED_`和`INTERFACE_`开头的属性来指定。例如，[IMPORTED_LOCATION](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED_LOCATION.html#prop_tgt:IMPORTED_LOCATION)包含到磁盘上目标的完整路径。
 
-### 导入可执行程序
+### 导入可执行文件
 
 首先，我们将介绍一个简单的示例，该示例创建一个[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)的可执行目标，然后从[add_custom_command()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/add_custom_command.html#command:add_custom_command)命令引用它。
 
-我们需要做一些准备工作来开始。我们希望创建一个可执行文件，在运行时在当前目录中创建一个基本的`main.cc`文件。这个项目的细节并不重要。导航到`Help/guide/importing-exporting/MyExe`目录，创建一个build目录，运行[cmake](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake.1.html#manual:cmake(1))，构建并安装项目。
+我们需要做一些准备工作来开始。我们希望创建一个可执行文件，在运行时在当前目录中创建一个基本的`main.cc`文件。这个项目的细节并不重要。导航到`Help/guide/importing-exporting/MyExe`目录，创建一个build目录，运行[cmake](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake.1.html#manual:cmake(1))命令构建并安装项目。
 
 ```shell
 $ cd Help/guide/importing-exporting/MyExe
@@ -28,6 +28,33 @@ $ cmake --install . --prefix <install location>
 $ <install location>/myexe
 $ ls
 [...] main.cc [...]
+```
+
+现在我们可以将这个可执行文件导入到另一个CMake项目中。本节的源代码可以在`Help/guide/importing-exporting/Importing`中找到。在CMakeLists文件中，使用[add_executable()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/add_executable.html#command:add_executable)命令创建一个名为`myexe`的新目标。使用`IMPORTED`选项告诉CMake这个目标引用了位于项目外部的一个可执行文件。不会生成任何规则来构建它，并且[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)目标属性将被设置为`true`。
+
+```CMake
+add_executable(myexe IMPORTED)
+```
+
+接下来，使用[set_property()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/set_property.html#command:set_property)命令设置目标的[IMPORTED_LOCATION](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED_LOCATION.html#prop_tgt:IMPORTED_LOCATION)属性。这将告诉CMake目标在磁盘上的位置。该位置可能需要调整到上一步中指定的`<install location>`。
+
+```CMake
+set_property(TARGET myexe PROPERTY
+            IMPORTED_LOCATION "../InstallMyExe/bin/myexe")
+```
+
+现在我们可以引用这个[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)目标，就像项目中构建的任何目标一样。在这个例子中，让我们假设我们想要在我们的项目中使用生成的源文件。在[add_custom_command()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/add_custom_command.html#command:add_custom_command)命令中使用[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)目标：
+
+```CMake
+add_custom_command(OUTPUT main.cc COMMAND myexe)
+```
+
+由于`COMMAND`指定了一个可执行的目标名称，它将自动被上面的[IMPORTED_LOCATION](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED_LOCATION.html#prop_tgt:IMPORTED_LOCATION)属性给出的可执行文件的位置所替换。
+
+最后，使用[add_custom_command()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/add_custom_command.html#command:add_custom_command)的输出：
+
+```CMake
+add_executable(mynewexe main.cc)
 ```
 
 ### 导入库
