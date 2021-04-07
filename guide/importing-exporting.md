@@ -59,6 +59,54 @@ add_executable(mynewexe main.cc)
 
 ### 导入库
 
+以类似的方式，可以通过[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)目标访问其他项目的库。
+
+**注意**:本节没有提供示例的完整源代码，仅作为读者的练习。
+
+在CMakeLists文件中，添加一个[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)库，并指定它在磁盘上的位置：
+
+```cmake
+add_library(foo STATIC IMPORTED)
+set_property(TARGET foo PROPERTY
+             IMPORTED_LOCATION "/path/to/libfoo.a")
+```
+
+然后在我们的项目中使用[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)库：
+
+```cmake
+add_executable(myexe src1.c src2.c)
+target_link_libraries(myexe PRIVATE foo)
+```
+
+在Windows上，.dll文件可以和它的.lib导入库一起导入：
+
+```cmake
+add_library(bar SHARED IMPORTED)
+set_property(TARGET bar PROPERTY
+             IMPORTED_LOCATION "c:/path/to/bar.dll")
+set_property(TARGET bar PROPERTY
+             IMPORTED_IMPLIB "c:/path/to/bar.lib")
+add_executable(myexe src1.c src2.c)
+target_link_libraries(myexe PRIVATE bar)
+```
+
+带有多个配置的库可以通过单个目标导入：
+
+```cmake
+find_library(math_REL NAMES m)
+find_library(math_DBG NAMES md)
+add_library(math STATIC IMPORTED GLOBAL)
+set_target_properties(math PROPERTIES
+  IMPORTED_LOCATION "${math_REL}"
+  IMPORTED_LOCATION_DEBUG "${math_DBG}"
+  IMPORTED_CONFIGURATIONS "RELEASE;DEBUG"
+)
+add_executable(myexe src1.c src2.c)
+target_link_libraries(myexe PRIVATE math)
+```
+
+生成的构建系统将在发布配置中构建`myexe`到`m.lib`，在调试配置中构建`md.lib`。
+
 ## 导出目标
 
 ## 创建浮动包
