@@ -109,7 +109,69 @@ target_link_libraries(myexe PRIVATE math)
 
 ## 导出目标
 
-## 创建浮动包
+虽然[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)目标本身是有用的，但它们仍然要求导入它们的项目知道目标文件在磁盘上的位置。[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)目标真正的强大之处在于，提供目标文件的项目还提供了一个CMake文件来帮助导入目标文件。可以通过设置一个项目来生成必要的信息，以便其他CMake项目可以很容易地从构建目录、本地安装或打包使用它。
+
+在其余部分中，我们将逐步介绍一组示例项目。第一个项目将创建并安装一个库以及相应的CMake配置和包文件。第二个项目将使用生成的包。
+
+让我们从`Help/guide/importing-exporting/MathFunctions`目录的`MathFunctions`项目开始。这里有一个`MathFunctions.h`头文件，里面声明了一个`sqrt`函数：
+
+```cpp
+#pragma once
+
+namespace MathFunctions {
+double sqrt(double x);
+}
+```
+
+以及相关的源文件`MathFunctions.cxx`：
+
+```cpp
+#include "MathFunctions.h"
+
+#include <cmath>
+
+namespace MathFunctions {
+double sqrt(double x)
+{
+  return std::sqrt(x);
+}
+}
+```
+
+不要担心C++文件的细节，这只是一个简单的示例，可在许多构建系统上编译和运行。
+
+现在我们可以为`MathFunctions`项目创建一个`CMakeLists.txt`文件。首先分别用[cmake_minimum_required()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/cmake_minimum_required.html#command:cmake_minimum_required)和[project()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/project.html#command:project)指定版本和名称：
+
+```cmake
+cmake_minimum_required(VERSION 3.15)
+project(MathFunctions)
+
+# specify the C++ standard
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+```
+
+使用[add_library()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/add_library.html#command:add_library)命令创建一个名为`MathFunctions`的库：
+
+```cmake
+add_library(MathFunctions STATIC MathFunctions.cxx)
+```
+
+然后使用[target_include_directories()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/target_include_directories.html#command:target_include_directories)命令为目标指定包含的目录：
+
+```cmake
+target_include_directories(MathFunctions
+                           PUBLIC
+                           "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
+                           "$<INSTALL_INTERFACE:include>"
+)
+```
+
+我们需要告诉CMake，我们想要使用不同的包含目录，这取决于我们是在构建库还是在安装位置使用它。如果我们不这样做，当CMake创建导出信息时，它将导出一个特定于当前构建目录的路径，对其他项目无效。我们可以使用[生成器表达式来](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7))指定在构建库时是否包含当前源目录。否则，在安装时，请包含包含目录。有关更多细节，请参阅[创建可重定位包](#创建可重定位包)一节。
+
+[install(TARGETS)](file:///C:/Program%20Files/CMake/doc/cmake/html/command/install.html#command:install)和[install(EXPORT)](file:///C:/Program%20Files/CMake/doc/cmake/html/command/install.html#command:install)命令一起工作，安装两个目标（在我们的例子中是一个库）和一个CMake文件，该文件旨在方便地将目标导入到另一个CMake项目中。
+
+## 创建可重定位包
 
 ## 使用包配置文件
 
