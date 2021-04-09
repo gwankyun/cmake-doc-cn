@@ -9,4 +9,4 @@ CMake中文文檔
 
 文檔中的鏈接指向安裝在`C:\Program Files\CMake`的本地文檔。
 
-同步至CMake 3.20。
+同步至CMake 3.20.1。
