@@ -171,6 +171,20 @@ target_include_directories(MathFunctions
 
 [install(TARGETS)](file:///C:/Program%20Files/CMake/doc/cmake/html/command/install.html#command:install)和[install(EXPORT)](file:///C:/Program%20Files/CMake/doc/cmake/html/command/install.html#command:install)命令一起工作，安装两个目标（在我们的例子中是一个库）和一个CMake文件，该文件旨在方便地将目标导入到另一个CMake项目中。
 
+首先，在[install(TARGETS)](file:///C:/Program%20Files/CMake/doc/cmake/html/command/install.html#command:install)命令中，我们将指定目标、导出名称和告诉CMake在何处安装目标的目标。
+
+```cmake
+install(TARGETS MathFunctions
+        EXPORT MathFunctionsTargets
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin
+        INCLUDES DESTINATION include
+)
+```
+
+这里，`EXPORT`选项告诉CMake创建一个名为`MathFunctionsTargets`的导出。生成的[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)目标设置了适当的属性来定义它们的[使用需求](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-buildsystem.7.html#target-usage-requirements)，例如[INTERFACE_INCLUDE_DIRECTORIES](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/INTERFACE_INCLUDE_DIRECTORIES.html#prop_tgt:INTERFACE_INCLUDE_DIRECTORIES)、[INTERFACE_COMPILE_DEFINITIONS](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/INTERFACE_COMPILE_DEFINITIONS.html#prop_tgt:INTERFACE_COMPILE_DEFINITIONS)和其他相关的内置`INTERFACE_`属性。在[COMPATIBLE_INTERFACE_STRING](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/COMPATIBLE_INTERFACE_STRING.html#prop_tgt:COMPATIBLE_INTERFACE_STRING)中列出的用户定义属性的`INTERFACE`变体和其他[兼容的接口属性](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-buildsystem.7.html#compatible-interface-properties)也会传播到生成的[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)目标。
+
 ## 创建可重定位包
 
 ## 使用包配置文件
