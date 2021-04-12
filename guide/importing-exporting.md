@@ -183,7 +183,25 @@ install(TARGETS MathFunctions
 )
 ```
 
-这里，`EXPORT`选项告诉CMake创建一个名为`MathFunctionsTargets`的导出。生成的[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)目标设置了适当的属性来定义它们的[使用需求](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-buildsystem.7.html#target-usage-requirements)，例如[INTERFACE_INCLUDE_DIRECTORIES](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/INTERFACE_INCLUDE_DIRECTORIES.html#prop_tgt:INTERFACE_INCLUDE_DIRECTORIES)、[INTERFACE_COMPILE_DEFINITIONS](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/INTERFACE_COMPILE_DEFINITIONS.html#prop_tgt:INTERFACE_COMPILE_DEFINITIONS)和其他相关的内置`INTERFACE_`属性。在[COMPATIBLE_INTERFACE_STRING](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/COMPATIBLE_INTERFACE_STRING.html#prop_tgt:COMPATIBLE_INTERFACE_STRING)中列出的用户定义属性的`INTERFACE`变体和其他[兼容的接口属性](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-buildsystem.7.html#compatible-interface-properties)也会传播到生成的[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)目标。
+这里，`EXPORT`选项告诉CMake创建一个名为`MathFunctionsTargets`的导出。生成的[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)目标设置了适当的属性来定义它们的[使用需求](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-buildsystem.7.html#target-usage-requirements)，例如[INTERFACE_INCLUDE_DIRECTORIES](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/INTERFACE_INCLUDE_DIRECTORIES.html#prop_tgt:INTERFACE_INCLUDE_DIRECTORIES)、[INTERFACE_COMPILE_DEFINITIONS](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/INTERFACE_COMPILE_DEFINITIONS.html#prop_tgt:INTERFACE_COMPILE_DEFINITIONS)和其他相关的内置`INTERFACE_`属性。在[COMPATIBLE_INTERFACE_STRING](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/COMPATIBLE_INTERFACE_STRING.html#prop_tgt:COMPATIBLE_INTERFACE_STRING)中列出的用户定义属性的`INTERFACE`变体和其他[兼容的接口属性](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-buildsystem.7.html#compatible-interface-properties)也会传播到生成的[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)目标。例如，在本例中，[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)目标将使用`INCLUDES DESTINATION`属性指定的目录填充其[INTERFACE_INCLUDE_DIRECTORIES](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/INTERFACE_INCLUDE_DIRECTORIES.html#prop_tgt:INTERFACE_INCLUDE_DIRECTORIES)属性。由于给出了一个相对路径，它被视为相对于[CMAKE_INSTALL_PREFIX](file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_INSTALL_PREFIX.html#variable:CMAKE_INSTALL_PREFIX)。
+
+注意，我们还没有要求CMake安装导出。
+
+我们不希望忘记使用[install(FILES)](file:///C:/Program%20Files/CMake/doc/cmake/html/command/install.html#command:install)命令安装`MathFunctions.h`头文件。头文件应该安装到`include`目录中，如上面的[target_include_directories()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/target_include_directories.html#command:target_include_directories)命令所指定的那样。
+
+```cmake
+install(FILES MathFunctions.h DESTINATION include)
+```
+
+现在`MathFunctions`库和头文件已经安装好了，我们还需要显式安装`MathFunctionsTargets`导出详细信息。按照[install(TARGETS)](file:///C:/Program%20Files/CMake/doc/cmake/html/command/install.html#command:install)命令的定义，使用[install(EXPORT)](file:///C:/Program%20Files/CMake/doc/cmake/html/command/install.html#command:install)命令导出`MathFunctionsTargets`中的目标。
+
+```cmake
+install(EXPORT MathFunctionsTargets
+        FILE MathFunctionsTargets.cmake
+        NAMESPACE MathFunctions::
+        DESTINATION lib/cmake/MathFunctions
+)
+```
 
 ## 创建可重定位包
 
