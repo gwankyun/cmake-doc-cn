@@ -203,6 +203,39 @@ install(EXPORT MathFunctionsTargets
 )
 ```
 
+这段代码与我们在[导入库](#导入库)一节中手工创建的示例非常相似。注意`${_IMPORT_PREFIX}`是相对于文件位置计算的。
+
+外部项目可以使用[include()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/include.html#command:include)命令加载该文件，并从安装树中引用`MathFunctions`库，就像在自己的树中构建一样。
+例如：
+
+```cmake
+ include(${INSTALL_PREFIX}/lib/cmake/MathFunctionTargets.cmake)
+ add_executable(myexe src1.c src2.c )
+ target_link_libraries(myexe PRIVATE MathFunctions::MathFunctions)
+```
+
+第1行加载目标CMake文件。尽管我们只导出了一个目标，但该文件可以导入任意数量的目标。它们的位置是相对于文件位置计算的，以便可以容易地移动安装树。第3行引用了导入的`MathFunctions`库。生成的构建系统将从库的安装位置链接到库。
+
+可执行文件也可以使用相同的过程导出和导入。
+
+任意数量的目标安装都可以与相同的导出名称相关联。导出名称被认为是全局的，因此任何目录都可以提供目标安装。[install(EXPORT)](file:///C:/Program%20Files/CMake/doc/cmake/html/command/install.html#command:install)命令只需要调用一次，就可以安装一个引用所有目标的文件。下面是一个示例，演示了如何将多个导出组合成一个导出文件，即使它们位于项目的不同子目录中。
+
+```cmake
+# A/CMakeLists.txt
+add_executable(myexe src1.c)
+install(TARGETS myexe DESTINATION lib/myproj
+        EXPORT myproj-targets)
+
+# B/CMakeLists.txt
+add_library(foo STATIC foo1.c)
+install(TARGETS foo DESTINATION lib EXPORTS myproj-targets)
+
+# Top CMakeLists.txt
+add_subdirectory (A)
+add_subdirectory (B)
+install(EXPORT myproj-targets DESTINATION lib/myproj)
+```
+
 ## 创建可重定位包
 
 ## 使用包配置文件
