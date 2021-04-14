@@ -238,6 +238,45 @@ install(EXPORT myproj-targets DESTINATION lib/myproj)
 
 ## 创建可重定位包
 
+此时，`MathFunctions`项目正在导出其他项目需要使用的目标信息。我们可以通过生成一个配置文件使这个项目更容易被其他项目使用，这样CMake[find_package()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/find_package.html#command:find_package)命令就可以找到我们的项目。
+
+首先，我们需要向`CMakeLists.txt`文件添加一些内容。首先，包含[CMakePackageConfigHelpers](file:///C:/Program%20Files/CMake/doc/cmake/html/module/CMakePackageConfigHelpers.html#module:CMakePackageConfigHelpers)模块，以访问一些用于创建配置文件的helper函数。
+
+```cmake
+include(CMakePackageConfigHelpers)
+```
+
+然后，我们将创建一个包配置文件和一个包版本文件。
+
 ## 使用包配置文件
+
+使用[CMakePackageConfigHelpers](file:///C:/Program%20Files/CMake/doc/cmake/html/module/CMakePackageConfigHelpers.html#module:CMakePackageConfigHelpers)提供的[configure_package_config_file()](file:///C:/Program%20Files/CMake/doc/cmake/html/module/CMakePackageConfigHelpers.html#command:configure_package_config_file)命令来生成包配置文件。注意，应该使用这个命令而不是普通的[configure_file()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/configure_file.html#command:configure_file)命令。通过避免安装的配置文件中的硬编码路径，它有助于确保生成的包是可重定位的。提供给`INSTALL_DESTINATION`的路径必须是`MathFunctionsConfig.cmake`文件将安装的目标。我们将在下一节中研究包配置文件的内容。
+
+```cmake
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/MathFunctionsConfig.cmake"
+  INSTALL_DESTINATION lib/cmake/MathFunctions
+)
+```
+
+使用[INSTALL(files)](file:///C:/Program%20Files/CMake/doc/cmake/html/command/install.html#command:install)命令安装生成的配置文件。`MathFunctionsConfigVersion.cmake`和`MathFunctionsConfig.cmake`都安装在相同的位置，从而完成了包。
+
+```cmake
+install(FILES
+          "${CMAKE_CURRENT_BINARY_DIR}/MathFunctionsConfig.cmake"
+          "${CMAKE_CURRENT_BINARY_DIR}/MathFunctionsConfigVersion.cmake"
+        DESTINATION lib/cmake/MathFunctions
+)
+```
+
+现在我们需要创建包配置文件本身。在本例中，`Config.cmake.in`文件非常简单，但足以允许下游使用[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)目标。
+
+```cmake
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/MathFunctionsTargets.cmake")
+
+check_required_components(MathFunctions)
+```
 
 ## 添加组件
