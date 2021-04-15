@@ -1,5 +1,7 @@
 # 导入导出指南
 
+[TOC]
+
 ## 简介
 
 在本指南中，我们将介绍[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)目标的概念，并演示如何将现有的可执行文件或库文件从磁盘导入到CMake项目中。然后，我们将展示CMake如何支持从一个基于CMake的项目导出目标，并将它们导入到另一个项目中。最后，我们将演示如何用配置文件打包一个项目，以方便集成到其他CMake项目中。本指南和完整的示例源代码可以在CMake源码树的`Help/guide/importing-exporting`目录中找到。
@@ -278,5 +280,31 @@ include("${CMAKE_CURRENT_LIST_DIR}/MathFunctionsTargets.cmake")
 
 check_required_components(MathFunctions)
 ```
+
+文件的第一行只包含字符串`@PACKAGE_INIT@`。这将在配置文件时展开，并允许使用以`PACKAGE_`为前缀的可重定位路径。它还提供了`set_and_check()`和`check_required_components()`宏。
+
+`check_required_components`帮助宏通过检查所有必需的组件的`<Package>_<Component>_FOUND`变量来确保所有被请求的、非可选的组件都已经找到。这个宏应该在包配置文件的末尾调用，即使包没有任何组件。通过这种方式，CMake可以确保下游项目没有指定任何不存在的组件。如果`check_required_components`失败，`<Package>_FOUND`变量被设置为FALSE，那么这个包被认为没有找到。
+
+宏`set_and_check()`应该在配置文件中使用，而不是用于设置目录和文件位置的常规`set()`命令。如果引用的文件或目录不存在，宏将失败。
+
+如果`MathFunctions`包应该提供任何宏，那么这些宏应该放在单独的文件中，该文件安装在与`MathFunctionsConfig.cmake`文件相同的位置，并包含在该文件中。
+
+**包的所有必需依赖项也必须在包配置文件中找到。** 让我们假设在我们的项目中需要`Stats`库。在CMakeLists文件中，我们将添加：
+
+```cmake
+find_package(Stats 2.6.4 REQUIRED)
+target_link_libraries(MathFunctions PUBLIC Stats::Types)
+```
+
+由于`Stats::Types`目标是`MathFunctions`的`PUBLIC`依赖项，下流也必须找到`Stats`包并链接到`Stats::Types`库。应该在配置文件中找到`Stats`包以确保这一点。
+
+```cmake
+include(CMakeFindDependencyMacro)
+find_dependency(Stats 2.6.4)
+```
+
+[CMakeFindDependencyMacro](file:///C:/Program%20Files/CMake/doc/cmake/html/module/CMakeFindDependencyMacro.html#module:CMakeFindDependencyMacro)模块中的`find_dependency`宏可以传播这个包是`REQUIRED`还是`QUIET`，等等。如果没有找到依赖项，`find_dependency`宏还将`MathFunctions_FOUND`设置为False，并诊断`MathFunctions`包不能在没有`Stats`包的情况下使用。
+
+**练习：** 向`MathFunctions`项目添加所需的库。
 
 ## 添加组件
