@@ -238,7 +238,7 @@ add_subdirectory (B)
 install(EXPORT myproj-targets DESTINATION lib/myproj)
 ```
 
-## 创建可重定位包
+### 创建包
 
 此时，`MathFunctions`项目正在导出其他项目需要使用的目标信息。我们可以通过生成一个配置文件使这个项目更容易被其他项目使用，这样CMake[find_package()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/find_package.html#command:find_package)命令就可以找到我们的项目。
 
@@ -250,7 +250,7 @@ include(CMakePackageConfigHelpers)
 
 然后，我们将创建一个包配置文件和一个包版本文件。
 
-## 使用包配置文件
+#### 创建包配置文件
 
 使用[CMakePackageConfigHelpers](file:///C:/Program%20Files/CMake/doc/cmake/html/module/CMakePackageConfigHelpers.html#module:CMakePackageConfigHelpers)提供的[configure_package_config_file()](file:///C:/Program%20Files/CMake/doc/cmake/html/module/CMakePackageConfigHelpers.html#command:configure_package_config_file)命令来生成包配置文件。注意，应该使用这个命令而不是普通的[configure_file()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/configure_file.html#command:configure_file)命令。通过避免安装的配置文件中的硬编码路径，它有助于确保生成的包是可重定位的。提供给`INSTALL_DESTINATION`的路径必须是`MathFunctionsConfig.cmake`文件将安装的目标。我们将在下一节中研究包配置文件的内容。
 
@@ -306,5 +306,38 @@ find_dependency(Stats 2.6.4)
 [CMakeFindDependencyMacro](file:///C:/Program%20Files/CMake/doc/cmake/html/module/CMakeFindDependencyMacro.html#module:CMakeFindDependencyMacro)模块中的`find_dependency`宏可以传播这个包是`REQUIRED`还是`QUIET`，等等。如果没有找到依赖项，`find_dependency`宏还将`MathFunctions_FOUND`设置为False，并诊断`MathFunctions`包不能在没有`Stats`包的情况下使用。
 
 **练习：** 向`MathFunctions`项目添加所需的库。
+
+#### 创建包版本文件
+
+[CMakePackageConfigHelpers](file:///C:/Program%20Files/CMake/doc/cmake/html/module/CMakePackageConfigHelpers.html#module:CMakePackageConfigHelpers)模块提供了[write_basic_package_version_file()](file:///C:/Program%20Files/CMake/doc/cmake/html/module/CMakePackageConfigHelpers.html#command:write_basic_package_version_file)命令来创建一个简单的包版本文件。当调用[find_package()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/find_package.html#command:find_package)来确定与请求版本的兼容性，并设置一些特定于版本的变量，如`<PackageName>_VERSION`， `<PackageName>_VERSION_MAJOR`， `<PackageName>_VERSION_MINOR`，等等时，CMake将读取该文件。更多细节请参阅[cmake-packages](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-packages.7.html#manual:cmake-packages(7))文档。
+
+```cmake
+set(version 3.4.1)
+
+set_property(TARGET MathFunctions PROPERTY VERSION ${version})
+set_property(TARGET MathFunctions PROPERTY SOVERSION 3)
+set_property(TARGET MathFunctions PROPERTY
+  INTERFACE_MathFunctions_MAJOR_VERSION 3)
+set_property(TARGET MathFunctions APPEND PROPERTY
+  COMPATIBLE_INTERFACE_STRING MathFunctions_MAJOR_VERSION
+)
+
+# generate the version file for the config file
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/MathFunctionsConfigVersion.cmake"
+  VERSION "${version}"
+  COMPATIBILITY AnyNewerVersion
+)
+```
+
+在我们的示例中，`MathFunctions_MAJOR_VERSION`被定义为一个[COMPATIBLE_INTERFACE_STRING](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/COMPATIBLE_INTERFACE_STRING.html#prop_tgt:COMPATIBLE_INTERFACE_STRING)，这意味着它必须在任何依赖项的依赖项之间兼容。通过在这个版本和下一个版本的`MathFunctions`中设置这个自定义的user属性，如果试图使用版本3和版本4，[cmake](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake.1.html#manual:cmake(1))将发出诊断。如果包的不同主要版本被设计成不兼容的，那么包可以选择使用这种模式。
+
+### 从构建目录导出目标
+
+### 构建并安装一个包
+
+## 创建一个浮动包
+
+## 使用包配置文件
 
 ## 添加组件
