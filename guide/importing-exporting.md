@@ -63,7 +63,7 @@ add_executable(mynewexe main.cc)
 
 以类似的方式，可以通过[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)目标访问其他项目的库。
 
-**注意**:本节没有提供示例的完整源代码，仅作为读者的练习。
+**注意**：本节没有提供示例的完整源代码，仅作为读者的练习。
 
 在CMakeLists文件中，添加一个[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)库，并指定它在磁盘上的位置：
 
@@ -111,7 +111,7 @@ target_link_libraries(myexe PRIVATE math)
 
 ## 导出目标
 
-虽然[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)目标本身是有用的，但它们仍然要求导入它们的项目知道目标文件在磁盘上的位置。[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)目标真正的强大之处在于，提供目标文件的项目还提供了一个CMake文件来帮助导入目标文件。可以通过设置一个项目来生成必要的信息，以便其他CMake项目可以很容易地从构建目录、本地安装或打包使用它。
+虽然[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)目标本身很有用，但它们仍然要求导入它们的项目知道目标文件在磁盘上的位置。[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED)目标真正的强大之处在于，提供目标文件的项目还提供了一个CMake文件来帮助导入目标文件。可以通过设置一个项目来生成必要的信息，以便其他CMake项目可以很容易地从构建目录、本地安装或打包使用它。
 
 在其余部分中，我们将逐步介绍一组示例项目。第一个项目将创建并安装一个库以及相应的CMake配置和包文件。第二个项目将使用生成的包。
 
@@ -334,10 +334,323 @@ write_basic_package_version_file(
 
 ### 从构建目录导出目标
 
+通常，在由外部项目使用之前，先构建和安装项目。但是，在某些情况下，最好直接从构建树导出目标。然后，这些目标可以由引用构建树的外部项目使用，而不涉及安装。[export()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/export.html#command:export)命令用于从项目构建树生成导出目标的文件。
+
+如果我们想要我们的示例项目也从一个构建目录使用，我们只需要添加以下`CMakeLists.txt`：
+
+```cmake
+export(EXPORT MathFunctionsTargets
+       FILE "${CMAKE_CURRENT_BINARY_DIR}/cmake/MathFunctionsTargets.cmake"
+       NAMESPACE MathFunctions::
+)
+```
+
+这里，我们使用[export()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/export.html#command:export)命令为构建树生成导出目标。
+在本例中，我们将在构建目录的`cmake`子目录中创建一个名为`MathFunctionsTargets.cmake`的文件。
+生成的文件包含导入目标所需的代码，并且可以由知道项目构建树的外部项目加载。
+这个文件是特定于构建树的，并且**是不可重定位的**。
+
+可以创建一个合适的包配置文件和包版本文件，为构建树定义一个包，可以在不安装的情况下使用。
+构建树的使用者可以简单地确保[CMAKE_PREFIX_PATH](file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_PREFIX_PATH.html#variable:CMAKE_PREFIX_PATH)包含构建目录，或者将缓存中的`MathFunctions_DIR`设置为`<build_dir>/MathFunctions`。
+
+该特性的一个应用示例是在交叉编译时在宿主平台上构建可执行文件。
+包含可执行文件的项目可以在宿主平台上构建，然后正在为另一个平台交叉编译的项目可以加载它。
+
 ### 构建并安装一个包
+
+至此，我们已经为我们的项目生成了一个可重定位的CMake配置，可以在项目安装后使用。
+让我们尝试构建`MathFunctions`项目：
+
+```shell
+mkdir MathFunctions_build
+cd MathFunctions_build
+cmake ../MathFunctions
+cmake --build .
+```
+
+在构建目录中，注意已经在`cmake`子目录中创建了`MathFunctionsTargets.cmake`文件。
+
+现在安装项目：
+
+```shell
+$ cmake --install . --prefix "/home/myuser/installdir"
+```
 
 ## 创建一个浮动包
 
+由[install(EXPORT)](file:///C:/Program%20Files/CMake/doc/cmake/html/command/install.html#command:install)创建的包被设计为可重定位的，使用相对于包本身位置的路径。它们不能引用构建包的机器上的文件的绝对路径，这些文件在可能安装包的机器上不存在。
+
+当定义`EXPORT`目标的接口时，请记住，include目录应该指定为[CMAKE_INSTALL_PREFIX](file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_INSTALL_PREFIX.html#variable:CMAKE_INSTALL_PREFIX)的相对路径，但不应该显式包含[CMAKE_INSTALL_PREFIX](file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_INSTALL_PREFIX.html#variable:CMAKE_INSTALL_PREFIX)：
+
+```cmake
+target_include_directories(tgt INTERFACE
+  # Wrong, not relocatable:
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include/TgtName>
+)
+
+target_include_directories(tgt INTERFACE
+  # Ok, relocatable:
+  $<INSTALL_INTERFACE:include/TgtName>
+)
+```
+
+`$<INSTALL_PREFIX>`
+[生成器表达式](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7))可以用作安装前缀的占位符，而不会导致不可重定位的包。
+如果使用复杂的生成器表达式，这是必要的：
+
+```cmake
+target_include_directories(tgt INTERFACE
+  # Ok, relocatable:
+  $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include/TgtName>
+)
+```
+
+这也适用于引用外部依赖项的路径。不建议使用与依赖项相关的路径填充任何可能包含路径的属性，例如[INTERFACE_INCLUDE_DIRECTORIES](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/INTERFACE_INCLUDE_DIRECTORIES.html#prop_tgt:INTERFACE_INCLUDE_DIRECTORIES)或[INTERFACE_LINK_LIBRARIES](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/INTERFACE_LINK_LIBRARIES.html#prop_tgt:INTERFACE_LINK_LIBRARIES)。例如，这段代码可能不适用于可重定位的包：
+
+```cmake
+target_link_libraries(MathFunctions INTERFACE
+  ${Foo_LIBRARIES} ${Bar_LIBRARIES}
+  )
+target_include_directories(MathFunctions INTERFACE
+  "$<INSTALL_INTERFACE:${Foo_INCLUDE_DIRS};${Bar_INCLUDE_DIRS}>"
+  )
+```
+
+引用的变量可能包含到库的绝对路径及包含**生成包的机器上**的引用目录。这将创建一个包，其中包含指向不适合重定位的依赖项的硬编码路径。
+
+理想情况下，这些依赖项应该通过它们自己的[IMPORTED目标](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-buildsystem.7.html#imported-targets)来使用，这些导入目标具有自己的[IMPORTED_LOCATION](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/IMPORTED_LOCATION.html#prop_tgt:IMPORTED_LOCATION)和使用需求属性，如适当填充的[INTERFACE_INCLUDE_DIRECTORIES](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/INTERFACE_INCLUDE_DIRECTORIES.html#prop_tgt:INTERFACE_INCLUDE_DIRECTORIES)。这些导入的目标可以与`MathFunctions`的[target_link_libraries()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/target_link_libraries.html#command:target_link_libraries)命令一起使用：
+
+```cmake
+target_link_libraries(MathFunctions INTERFACE Foo::Foo Bar::Bar)
+```
+
+使用这种方法，包仅通过[IMPORTED](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-buildsystem.7.html#imported-targets)目标的名称引用其外部依赖项。当使用者使用已安装的包时，使用者将运行适当的[find_package()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/find_package.html#command:find_package)命令(通过上面描述的`find_dependency`宏)来查找依赖项，并在自己的机器上用适当的路径填充导入的目标。
+
 ## 使用包配置文件
 
+现在，我们准备创建一个项目来使用已安装的`MathFunctions`库。在本节中，我们将使用来自`Help\guide\importing-exporting\Downstream`的源代码。在这个目录中，有一个名为`main.cc`的源文件，它使用`MathFunctions`库计算给定数字的平方根，然后打印结果：
+
+```cpp
+// A simple program that outputs the square root of a number
+#include <iostream>
+#include <string>
+
+#include "MathFunctions.h"
+
+int main(int argc, char* argv[])
+{
+  if (argc < 2) {
+    std::cout << "Usage: " << argv[0] << " number" << std::endl;
+    return 1;
+  }
+
+  // convert input to double
+  const double inputValue = std::stod(argv[1]);
+
+  // calculate square root
+  const double sqrt = MathFunctions::sqrt(inputValue);
+  std::cout << "The square root of " << inputValue << " is " << sqrt
+            << std::endl;
+
+  return 0;
+}
+```
+
+与前面一样，我们将从`CMakeLists.txt`文件中的[cmake_minimum_required()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/cmake_minimum_required.html#command:cmake_minimum_required)和[project()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/project.html#command:project)命令开始。对于这个项目，我们还将指定c++标准。
+
+```cmake
+cmake_minimum_required(VERSION 3.15)
+project(Downstream)
+
+# specify the C++ standard
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+```
+
+我们可以使用[find_package()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/find_package.html#command:find_package)命令：
+
+```cmake
+find_package(MathFunctions 3.4.1 EXACT)
+```
+
+创建一个可执行文件：
+
+```cmake
+add_executable(myexe main.cc)
+```
+
+并链接`MathFunctions`库：
+
+```cmake
+target_link_libraries(myexe PRIVATE MathFunctions::MathFunctions)
+```
+
+就是这样！现在让我们来构建`Downstream`项目。
+
+```shell
+mkdir Downstream_build
+cd Downstream_build
+cmake ../Downstream
+cmake --build .
+```
+
+CMake配置过程中可能会出现警告：
+
+```shell
+CMake Warning at CMakeLists.txt:4 (find_package):
+  By not providing "FindMathFunctions.cmake" in CMAKE_MODULE_PATH this
+  project has asked CMake to find a package configuration file provided by
+  "MathFunctions", but CMake did not find one.
+
+  Could not find a package configuration file provided by "MathFunctions"
+  with any of the following names:
+
+    MathFunctionsConfig.cmake
+    mathfunctions-config.cmake
+
+  Add the installation prefix of "MathFunctions" to CMAKE_PREFIX_PATH or set
+  "MathFunctions_DIR" to a directory containing one of the above files.  If
+  "MathFunctions" provides a separate development package or SDK, be sure it
+  has been installed.
+```
+
+将`CMAKE_PREFIX_PATH`设置为先前安装MathFunctions的位置，然后再试一次。确保新创建的可执行文件按预期运行。
+
 ## 添加组件
+
+让我们编辑`MathFunctions`项目以使用组件。本节的源代码可以在`Help\guide\importing-exporting\MathFunctionsComponents`中找到。这个项目的CMakeLists文件添加了两个子目录：`Addition`和`squeroot`。
+
+```cmake
+cmake_minimum_required(VERSION 3.15)
+project(MathFunctionsComponents)
+
+# specify the C++ standard
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+add_subdirectory(Addition)
+add_subdirectory(SquareRoot)
+```
+
+生成并安装包配置文件和包版本文件：
+
+```cmake
+include(CMakePackageConfigHelpers)
+
+# set version
+set(version 3.4.1)
+
+# generate the version file for the config file
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/MathFunctionsConfigVersion.cmake"
+  VERSION "${version}"
+  COMPATIBILITY AnyNewerVersion
+)
+
+# create config file
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/MathFunctionsConfig.cmake"
+  INSTALL_DESTINATION lib/cmake/MathFunctions
+  NO_CHECK_REQUIRED_COMPONENTS_MACRO
+)
+
+# install config files
+install(FILES
+          "${CMAKE_CURRENT_BINARY_DIR}/MathFunctionsConfig.cmake"
+          "${CMAKE_CURRENT_BINARY_DIR}/MathFunctionsConfigVersion.cmake"
+        DESTINATION lib/cmake/MathFunctions
+)
+```
+
+如果在下游使用[find_package()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/find_package.html#command:find_package)时指定了`COMPONENTS`，则它们将列在`<PackageName>_FIND_COMPONENTS`变量中。我们可以使用这个变量来验证所有必要的组件目标都包含在`Config.cmake.in`中。同时，这个函数将充当一个自定义的`check_required_components`宏，以确保下游只尝试使用受支持的组件。
+
+```cmake
+@PACKAGE_INIT@
+
+set(_supported_components Addition SquareRoot)
+
+foreach(_comp ${MathFunctions_FIND_COMPONENTS})
+  if (NOT _comp IN_LIST _supported_components)
+    set(MathFunctions_FOUND False)
+    set(MathFunctions_NOT_FOUND_MESSAGE "Unsupported component: ${_comp}")
+  endif()
+  include("${CMAKE_CURRENT_LIST_DIR}/MathFunctions${_comp}Targets.cmake")
+endforeach()
+```
+
+在这里，`MathFunctions_NOT_FOUND_MESSAGE`被设置为由于指定了无效组件而无法找到包的诊断。当`_FOUND`变量设置为`False`时，可以设置此消息变量，并将其显示给用户。
+
+`Addition`和`SquareRoot`目录是类似的。让我们看看其中一个CMakeLists文件：
+
+```cmake
+# create library
+add_library(SquareRoot STATIC SquareRoot.cxx)
+
+add_library(MathFunctions::SquareRoot ALIAS SquareRoot)
+
+# add include directories
+target_include_directories(SquareRoot
+                           PUBLIC
+                           "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
+                           "$<INSTALL_INTERFACE:include>"
+)
+
+# install the target and create export-set
+install(TARGETS SquareRoot
+        EXPORT SquareRootTargets
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin
+        INCLUDES DESTINATION include
+)
+
+# install header file
+install(FILES SquareRoot.h DESTINATION include)
+
+# generate and install export file
+install(EXPORT SquareRootTargets
+        FILE MathFunctionsSquareRootTargets.cmake
+        NAMESPACE MathFunctions::
+        DESTINATION lib/cmake/MathFunctions
+)
+```
+
+现在我们可以按照前面章节中描述的方式构建项目。要使用这个包进行测试，我们可以在`Help\guide\importing-exporting\DownstreamComponents`中使用这个项目。与之前的`Downstream`项目有两点不同。首先，我们需要找到包组件。将`find_package`行从：
+
+```cmake
+find_package(MathFunctions 3.4.1 EXACT)
+```
+
+改为：
+
+```cmake
+find_package(MathFunctions 3.4 COMPONENTS Addition SquareRoot)
+```
+
+并将`target_link_libraries`行从：
+
+```cmake
+target_link_libraries(myexe PRIVATE MathFunctions::MathFunctions)
+```
+
+改为：
+
+```cmake
+target_link_libraries(myexe PRIVATE MathFunctions::Addition MathFunctions::SquareRoot)
+```
+
+将`main.cc`文件中的`#include "MathFunctions.h"`替换为：
+
+```cpp
+#include "Addition.h"
+#include "SquareRoot.h"
+```
+
+最后，使用`Addition`库：
+
+```cpp
+  const double sum = MathFunctions::add(inputValue, inputValue);
+  std::cout << inputValue << " + " << inputValue << " = " << sum << std::endl;
+```
+
+构建`Downstream`项目，并确认它能够找到并使用包组件。
