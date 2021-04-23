@@ -131,7 +131,7 @@ Tutorial
 
 在本教程中，我们将把这个库放入名为MathFunctions的子目录中。这个目录已经包含了一个头文件`MathFunctions.h`和一个源文件`mysqrt.cxx`。源文件有一个名为`mysqrt`的函数，功能类似于自带的`sqrt`函数。
 
-将以下一行`CMakeLists.txt`文件添加到`MathFunctions`目录:
+将以下一行`CMakeLists.txt`文件添加到`MathFunctions`目录：
 
 ```cmake
 add_library(MathFunctions mysqrt.cxx)
@@ -572,9 +572,9 @@ ctest [-VV] -C Debug -D Experimental
 
 ## 混合使用靜態庫和共享庫（第九步）
 
-在本节中，我们将展示如何使用[BUILD_SHARED_LIBS](https://)变量来控制[add_library()](https://)的默认行为，并允许控制没有显式类型的库（`STATIC`、`SHARED`、`MODULE`或者`OBJECT`）是如何构建的。
+在本节中，我们将展示如何使用[BUILD_SHARED_LIBS](file:///C:/Program%20Files/CMake/doc/cmake/html/variable/BUILD_SHARED_LIBS.html#variable:BUILD_SHARED_LIBS)变量来控制[add_library()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/add_library.html#command:add_library)的默认行为，并允许控制没有显式类型的库（`STATIC`、`SHARED`、`MODULE`或者`OBJECT`）是如何构建的。
 
-为此，我们需要将[BUILD_SHARED_LIBS](https://)添加到顶层`CMakeLists.txt`中。我们使用[option()](https://)命令，因为它能用户选择值为ON或者OFF。
+为此，我们需要将[BUILD_SHARED_LIBS](file:///C:/Program%20Files/CMake/doc/cmake/html/variable/BUILD_SHARED_LIBS.html#variable:BUILD_SHARED_LIBS)添加到顶层`CMakeLists.txt`中。我们使用[option()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/option.html#command:option)命令，因为它能用户选择值为ON或者OFF。
 
 接下来，我们将重构MathFunctions，使其成为一个使用`mysqrt`或`sqrt`封装的真正的库，而不是要求在代码处理这些逻辑。这也意味着`USE_MYMATH`将不再控制构建MathFunctions，而是控制这个库的行为。
 
@@ -732,7 +732,7 @@ double DECLSPEC sqrt(double x);
 }
 ```
 
-此时，如果您构建了所有内容，您可能会注意到，当我们将一个没有位置独立代码的静态库与一个有位置独立代码的库组合在一起时，链接会失败。解决这个问题的方法是显式地将SqrtLibrary的[POSITION_INDEPENDENT_CODE](https://)目标属性设置为True，不管构建类型是什么。
+此时，如果您构建了所有内容，您可能会注意到，当我们将一个没有位置独立代码的静态库与一个有位置独立代码的库组合在一起时，链接会失败。解决这个问题的方法是显式地将SqrtLibrary的[POSITION_INDEPENDENT_CODE](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/POSITION_INDEPENDENT_CODE.html#prop_tgt:POSITION_INDEPENDENT_CODE)目标属性设置为True，不管构建类型是什么。
 
 ```cmake
   # state that SqrtLibrary need PIC when the default is shared libraries
@@ -747,17 +747,17 @@ double DECLSPEC sqrt(double x);
 
 ## 添加生成器表达式（第十步）
 
-[生成器表达式](Generator expressions)在生成生成系统期间计算，以生成特定于每个生成配置的信息。
+[生成器表达式](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7))在生成生成系统期间计算，以生成特定于每个生成配置的信息。
 
-[生成器表达式](https://)可以在许多目标属性的上下文中使用，比如[LINK_LIBRARIES](https://)、[INCLUDE_DIRECTORIES](https://)、[COMPILE_DEFINITIONS](https://)等。它们也可以在使用命令填充那些属性时使用，比如[target_link_libraries()](https://)、[target_include_directories()](https://)、[target_compile_definitions()](https://)等。
+[生成器表达式](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7))可以在许多目标属性的上下文中使用，比如[LINK_LIBRARIES](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/LINK_LIBRARIES.html#prop_tgt:LINK_LIBRARIES)、[INCLUDE_DIRECTORIES](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/INCLUDE_DIRECTORIES.html#prop_tgt:INCLUDE_DIRECTORIES)、[COMPILE_DEFINITIONS](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/COMPILE_DEFINITIONS.html#prop_tgt:COMPILE_DEFINITIONS)等。它们也可以在使用命令填充那些属性时使用，比如[target_link_libraries()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/target_link_libraries.html#command:target_link_libraries)、[target_include_directories()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/target_include_directories.html#command:target_include_directories)、[target_compile_definitions()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/target_compile_definitions.html#command:target_compile_definitions)等。
 
-[生成器表达式](https://)可用于启用条件链接、编译时使用的条件定义、条件包含目录等等。这些条件可能基于构建配置、目标属性、平台信息或任何其他可查询的信息。
+[生成器表达式](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7))可用于启用条件链接、编译时使用的条件定义、条件包含目录等等。这些条件可能基于构建配置、目标属性、平台信息或任何其他可查询的信息。
 
-[生成器表达式](https://)有不同的类型，包括逻辑表达式、信息表达式和输出表达式
+[生成器表达式](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7))有不同的类型，包括逻辑表达式、信息表达式和输出表达式
 
 逻辑表达式用于创建条件输出。基本表达式是0和1表达式。`$<0:...>`结果为空字符串，并且`<1:...>`导致“…”的内容。它们也可以嵌套。
 
-[生成器表达式](https://)的常见用法是有条件地添加编译器标志，例如用于语言级别或警告的标志。一个不错的模式是将此信息关联到允许传播此信息的`INTERFACE`接口目标。让我们首先构造一个`INTERFACE`目标，并指定所需的c++标准级别`11`，而不是使用[CMAKE_CXX_STANDARD](https://)。
+[生成器表达式](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7))的常见用法是有条件地添加编译器标志，例如用于语言级别或警告的标志。一个不错的模式是将此信息关联到允许传播此信息的`INTERFACE`接口目标。让我们首先构造一个`INTERFACE`目标，并指定所需的c++标准级别`11`，而不是使用[CMAKE_CXX_STANDARD](file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_CXX_STANDARD.html#variable:CMAKE_CXX_STANDARD)。
 
 所以下面的代码：
 
@@ -787,15 +787,15 @@ target_compile_options(tutorial_compiler_flags INTERFACE
 
 我们看到警告标志被封装在`BUILD_INTERFACE`条件中。这样做是为了使已安装项目的使用者不会继承我们的警告标志。
 
-**练习**：修改`MathFunctions/cmakellists.txt`，使所有目标都有一个[target_link_libraries()](https://)调用`tutorial_compiler_flags`。
+**练习**：修改`MathFunctions/cmakellists.txt`，使所有目标都有一个[target_link_libraries()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/target_link_libraries.html#command:target_link_libraries)调用`tutorial_compiler_flags`。
 
 ## 添加导出配置（第十一步）
 
-在[安装和测试（第四步）](https://)教程中，我们增加了CMake安装项目库和头文件的能力。在[构建安装程序（第七步）](https://)期间，我们添加了打包这些信息的功能，以便将其分发给其他人。
+在[安装和测试（第四步）](#安装和测试（第四步）)教程中，我们增加了CMake安装项目库和头文件的能力。在[构建安装程序（第七步）](#构建安装程序（第七步）)期间，我们添加了打包这些信息的功能，以便将其分发给其他人。
 
 下一步是添加必要的信息，以便其他CMake项目可以使用我们的项目，无论是在构建目录、本地安装还是打包时。
 
-第一步是更新我们的[install(TARGETS)](https://)命令，不仅指定`DESTINATION`，还指定`EXPORT`。`EXPORT`关键字生成并安装一个CMake文件，其中包含从安装树导入安装命令中列出的所有目标的代码。所以让我们继续，通过更新`MathFunctions/CMakeLists.txt`中的`install`命令来显式`EXPORT`MathFunctions库，如下所示：
+第一步是更新我们的[install(TARGETS)](file:///C:/Program%20Files/CMake/doc/cmake/html/command/install.html#command:install)命令，不仅指定`DESTINATION`，还指定`EXPORT`。`EXPORT`关键字生成并安装一个CMake文件，其中包含从安装树导入安装命令中列出的所有目标的代码。所以让我们继续，通过更新`MathFunctions/CMakeLists.txt`中的`install`命令来显式`EXPORT`MathFunctions库，如下所示：
 
 ```cmake
 set(installable_libs MathFunctions tutorial_compiler_flags)
@@ -828,7 +828,7 @@ path:
 which is prefixed in the source directory.
 ```
 
-CMake试图说明的是，在生成导出信息的过程中，它将导出一个本质上与当前机器相关联的路径，该路径在其他机器上无效。解决这个问题的方法是更新MathFunctions [target_include_directories()](https://)，以理解在构建目录和安装/包中使用它时需要不同的`INTERFACE`位置。这意味着将MathFunctions的[target_include_directories()](https://)调用转换成如下所示：
+CMake试图说明的是，在生成导出信息的过程中，它将导出一个本质上与当前机器相关联的路径，该路径在其他机器上无效。解决这个问题的方法是更新MathFunctions [target_include_directories()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/target_include_directories.html#command:target_include_directories)，以理解在构建目录和安装/包中使用它时需要不同的`INTERFACE`位置。这意味着将MathFunctions的[target_include_directories()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/target_include_directories.html#command:target_include_directories)调用转换成如下所示：
 
 ```cmake
 target_include_directories(MathFunctions
@@ -840,7 +840,7 @@ target_include_directories(MathFunctions
 
 一旦它被更新，我们可以重新运行CMake并验证它不再发出警告。
 
-此时，我们已经让CMake正确地打包了所需的目标信息，但我们仍然需要生成`MathFunctionsConfig.cmake`。让cmake的[find_package()](https://)命令可以找到我们的项目。因此，让我们继续往项目的顶层添加一个名为`Config.cmake.in`的新文件。内附以下内容：
+此时，我们已经让CMake正确地打包了所需的目标信息，但我们仍然需要生成`MathFunctionsConfig.cmake`。让cmake的[find_package()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/find_package.html#command:find_package)命令可以找到我们的项目。因此，让我们继续往项目的顶层添加一个名为`Config.cmake.in`的新文件。内附以下内容：
 
 ```cmake
 
@@ -897,7 +897,7 @@ export(EXPORT MathFunctionsTargets
 
 首先，我们希望确保调试版本和发布版本对将要安装的可执行文件和库使用不同的名称。让我们使用*d*作为调试可执行文件和库的后缀。
 
-在顶层`CMakeLists.txt`文件的开头设置[CMAKE_DEBUG_POSTFIX](https://)：
+在顶层`CMakeLists.txt`文件的开头设置[CMAKE_DEBUG_POSTFIX](file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_DEBUG_POSTFIX.html#variable:CMAKE_DEBUG_POSTFIX)：
 
 ```cmake
 set(CMAKE_DEBUG_POSTFIX d)
@@ -905,7 +905,7 @@ set(CMAKE_DEBUG_POSTFIX d)
 add_library(tutorial_compiler_flags INTERFACE)
 ```
 
-和tutorial可执行文件上的[DEBUG_POSTFIX](https://)属性：
+和tutorial可执行文件上的[DEBUG_POSTFIX](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/DEBUG_POSTFIX.html#prop_tgt:DEBUG_POSTFIX)属性：
 
 ```cmake
 add_executable(Tutorial tutorial.cxx)
@@ -914,7 +914,7 @@ set_target_properties(Tutorial PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
 target_link_libraries(Tutorial PUBLIC MathFunctions)
 ```
 
-让我们再向MathFunctions库添加版本号。在`MathFunctions/CMakeLists.txt`设置[VERSION](https://)和[SOVERSION](https://)属性：
+让我们再向MathFunctions库添加版本号。在`MathFunctions/CMakeLists.txt`设置[VERSION](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/VERSION.html#prop_tgt:VERSION)和[SOVERSION](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/SOVERSION.html#prop_tgt:SOVERSION)属性：
 
 ```cmake
 set_property(TARGET MathFunctions PROPERTY VERSION "1.0.0")
@@ -929,7 +929,7 @@ set_property(TARGET MathFunctions PROPERTY SOVERSION "1")
    - release
 ```
 
-现在我们需要设置调试和发布构建。我们可以使用[CMAKE_BUILD_TYPE](https://)来设置配置类型：
+现在我们需要设置调试和发布构建。我们可以使用[CMAKE_BUILD_TYPE](file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_BUILD_TYPE.html#variable:CMAKE_BUILD_TYPE)来设置配置类型：
 
 ```shell
 cd debug
@@ -940,7 +940,7 @@ cmake -DCMAKE_BUILD_TYPE=Release ..
 cmake --build .
 ```
 
-现在调试版本和发布版本都已经完成了，我们可以使用一个定制的配置文件将这两个版本打包到一个版本中。在`Step12`目录中，创建一个名为`MultiCPackConfig.cmake`的文件。在这个文件中，首先包含[cmake](https://)可执行文件创建的默认配置文件。
+现在调试版本和发布版本都已经完成了，我们可以使用一个定制的配置文件将这两个版本打包到一个版本中。在`Step12`目录中，创建一个名为`MultiCPackConfig.cmake`的文件。在这个文件中，首先包含[cmake](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake.1.html#manual:cmake(1))可执行文件创建的默认配置文件。
 
 接下来，使用`CPACK_INSTALL_CMAKE_PROJECTS`变量来指定要安装哪些项目。在这种情况下，我们希望同时安装调试和发布。
 
@@ -953,7 +953,7 @@ set(CPACK_INSTALL_CMAKE_PROJECTS
     )
 ```
 
-在`Step12`目录下，运行[cpack](https://)，指定我们的配置文件`config`选项：
+在`Step12`目录下，运行[cpack](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cpack.1.html#manual:cpack(1))，指定我们的配置文件`config`选项：
 
 ```shell
 cpack --config MultiCPackConfig.cmake
