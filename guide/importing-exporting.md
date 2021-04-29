@@ -169,7 +169,7 @@ target_include_directories(MathFunctions
 )
 ```
 
-我们需要告诉CMake，我们想要使用不同的包含目录，这取决于我们是在构建库还是在安装位置使用它。如果我们不这样做，当CMake创建导出信息时，它将导出一个特定于当前构建目录的路径，对其他项目无效。我们可以使用[生成器表达式来](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7))指定在构建库时是否包含当前源目录。否则，在安装时，请包含包含目录。有关更多细节，请参阅[创建可重定位包](#创建可重定位包)一节。
+我们需要告诉CMake，我们想要使用不同的包含目录，这取决于我们是在构建库还是在安装位置使用它。如果我们不这样做，当CMake创建导出信息时，它将导出一个特定于当前构建目录的路径，对其他项目无效。我们可以使用[生成器表达式来](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7))指定在构建库时包含当前源目录。否则，在安装时包含`include`目录。更多有关细节，请参阅[创建可重定位包](#创建可重定位包)一节。
 
 [install(TARGETS)](file:///C:/Program%20Files/CMake/doc/cmake/html/command/install.html#command:install)和[install(EXPORT)](file:///C:/Program%20Files/CMake/doc/cmake/html/command/install.html#command:install)命令一起工作，安装两个目标（在我们的例子中是一个库）和一个CMake文件，该文件旨在方便地将目标导入到另一个CMake项目中。
 
@@ -207,7 +207,7 @@ install(EXPORT MathFunctionsTargets
 
 这段代码与我们在[导入库](#导入库)一节中手工创建的示例非常相似。注意`${_IMPORT_PREFIX}`是相对于文件位置计算的。
 
-外部项目可以使用[include()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/include.html#command:include)命令加载该文件，并从安装树中引用`MathFunctions`库，就像在自己的树中构建一样。
+外部项目可以使用[include()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/include.html#command:include)命令加载该文件，并从安装目录中引用`MathFunctions`库，就像在自己的目录中构建一样。
 例如：
 
 ```cmake
