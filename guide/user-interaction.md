@@ -37,7 +37,7 @@ CMake工具可能会报告针对软件提供商的警告，而不是针对软件
 
 必须首先填充源目录和二进制目录。总是建议为源文件和构建文件使用不同的目录。
 
-![GUI-Source-Binary](file:///C:/Program%20Files/CMake/doc/cmake/html/_images/GUI-Source-Binary.png)
+![选择源码及二进制目录](file:///C:/Program%20Files/CMake/doc/cmake/html/_images/GUI-Source-Binary.png)
 
 ## 生成一个构建系统
 
@@ -63,7 +63,72 @@ Visual Studio提供了多个命令提示符和`vcvarsal.bat`脚本，用于为�
 
 ### 命令行-G选项
 
+CMake根据平台默认选择一个生成器。通常，默认生成器足以允许用户继续构建软件。
+
+用户可以使用`-G`选项覆盖默认生成器：
+
+```shell
+$ cmake .. -G Ninja
+```
+
+`cmake ——help`的输出包括一个可供用户选择的[生成器](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-generators.7.html#manual:cmake-generators(7))列表。注意，生成器名称是区分大小写的。
+
+在类Unix系统（包括Mac OS X）上，默认情况下使用[Unix Makefiles](file:///C:/Program%20Files/CMake/doc/cmake/html/generator/Unix%20Makefiles.html#generator:Unix%20Makefiles)生成器。该生成器的一个变体也可以在各种环境的Windows上使用，比如[NMake Makefiles](file:///C:/Program%20Files/CMake/doc/cmake/html/generator/NMake%20Makefiles.html#generator:NMake%20Makefiles)和[MinGW Makefiles](file:///C:/Program%20Files/CMake/doc/cmake/html/generator/MinGW%20Makefiles.html#generator:MinGW%20Makefiles)生成器。这些生成器生成一个`Makefile`变体，可以用`make`、`gmake`、`nmake`或类似工具执行。有关目标环境和工具的更多信息，请参见单个生成器文档。
+
+[Ninja](file:///C:/Program%20Files/CMake/doc/cmake/html/generator/Ninja.html#generator:Ninja)生成器适用于所有主要平台。`Ninja`是一个用法类似于`make`的构建工具，但侧重于性能和效率。
+
+在Windows上，可以使用[cmake(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake.1.html#manual:cmake(1))为Visual Studio IDE生成解决方案。Visual Studio版本可以通过IDE的产品名来指定，其中包含一个四位数字的年份。别名也可以用来表示Visual Studio版本，比如两个数字对应于visualc++编译器的产品版本，或者两者的组合：
+
+```shell
+$ cmake .. -G "Visual Studio 2019"
+$ cmake .. -G "Visual Studio 16"
+$ cmake .. -G "Visual Studio 16 2019"
+```
+
+Visual Studio生成器可以针对不同的架构。可以使用 *-A* 选项指定目标架构：
+
+```shell
+cmake .. -G "Visual Studio 2019" -A x64
+cmake .. -G "Visual Studio 16" -A ARM
+cmake .. -G "Visual Studio 16 2019" -A ARM64
+```
+
+在苹果，[Xcode](file:///C:/Program%20Files/CMake/doc/cmake/html/generator/Xcode.html#generator:Xcode)生成器可能被用来为Xcode IDE生成项目文件。
+
+一些ide，如KDevelop4, QtCreator和CLion，对基于cmake的构建系统有本地支持。这些ide提供了选择要使用的底层生成器的用户界面，通常是在`Makefile`或基于`Ninja`的生成器之间进行选择。
+
+注意，在第一次调用CMake之后，不可能用`-G`来更改生成器。要更改生成器，必须删除构建目录，并且必须从头开始构建。
+
+当生成Visual Studio项目和解决方案文件时，在最初运行[cmake(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake.1.html#manual:cmake(1))时，可以使用其他几个选项。
+
+Visual Studio工具集可以通过`-T`选项来指定：
+
+```shell
+$ # Build with the clang-cl toolset
+$ cmake.exe .. -G "Visual Studio 16 2019" -A x64 -T ClangCL
+$ # Build targeting Windows XP
+$ cmake.exe .. -G "Visual Studio 16 2019" -A x64 -T v120_xp
+```
+
+`-A`选项指定_target_体系结构，而`-T`选项可用于指定所使用的工具链的详细信息。例如，可以使用 *-Thost=x64* 来选择64位版本的主机工具。下面演示了如何使用64位工具，以及如何构建64位目标体系结构：
+
+```shell
+$ cmake .. -G "Visual Studio 16 2019" -A x64 -Thost=x64
+```
+
 ### 在cmake-gui选择生成器
+
+“Configure”按钮会触发一个新的对话框来选择要使用的CMake生成器。
+
+![配置一个生成器](file:///C:/Program%20Files/CMake/doc/cmake/html/_images/GUI-Configure-Dialog.png)
+
+命令行中可用的所有生成器在[cmake-gui(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-gui.1.html#manual:cmake-gui(1))中也可用。
+
+![选择一个生成器](file:///C:/Program%20Files/CMake/doc/cmake/html/_images/GUI-Choose-Generator.png)
+
+当选择生成器时，可以使用更多选项来设置要生成的体系结构。
+
+![选择Visual Studio生成器的体系结构](file:///C:/Program%20Files/CMake/doc/cmake/html/_images/VS-Choose-Arch.png)
 
 ## 设置构建变量
 
