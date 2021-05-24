@@ -132,11 +132,92 @@ $ cmake .. -G "Visual Studio 16 2019" -A x64 -Thost=x64
 
 ## 设置构建变量
 
+软件项目在调用CMake时通常需要在命令行上设置变量。下表列出了一些最常用的CMake变量：
+
+<table>
+  <tr>
+    <th>变量</th>
+    <th>含意</th>
+  </tr>
+  <tr>
+    <td><a href="file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_PREFIX_PATH.html#variable:CMAKE_PREFIX_PATH">CMAKE_PREFIX_PATH</a></td>
+    <td>搜索<a href="./using-dependencies.md">依赖包</a>的路径</td>
+  </tr>
+  <tr>
+    <td><a href="file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_MODULE_PATH.html#variable:CMAKE_MODULE_PATH">CMAKE_MODULE_PATH</a></td>
+    <td>搜索其他CMake模块的路径</td>
+  </tr>
+  <tr>
+    <td><a href="file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_BUILD_TYPE.html#variable:CMAKE_BUILD_TYPE">CMAKE_BUILD_TYPE</a></td>
+    <td>构建配置，如<code>Debug</code>或<code>Relase</code>，确定调试/优化标志。这只与单配置构建系统相关，比如<code>Makefile</code>和<code>Ninja</code>。Visual Studio和Xcode等多配置构建系统忽略了这个设置。</td>
+  </tr>
+  <tr>
+    <td><a href="file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_INSTALL_PREFIX.html#variable:CMAKE_INSTALL_PREFIX">CMAKE_INSTALL_PREFIX</a></td>
+    <td>使用<code>install</code>构建目标安装软件的位置</td>
+  </tr>
+  <tr>
+    <td><a href="file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_TOOLCHAIN_FILE.html#variable:CMAKE_TOOLCHAIN_FILE">CMAKE_TOOLCHAIN_FILE</a></td>
+    <td>包含交叉编译数据的文件，例如<a href="file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-toolchains.7.html#manual:cmake-toolchains(7)">工具链和sysroot</a>。</td>
+  </tr>
+  <tr>
+    <td><a href="file:///C:/Program%20Files/CMake/doc/cmake/html/variable/BUILD_SHARED_LIBS.html#variable:BUILD_SHARED_LIBS">BUILD_SHARED_LIBS</a></td>
+    <td>是否为没有类型的<a href="file:///C:/Program%20Files/CMake/doc/cmake/html/command/add_library.html#command:add_library">add_library()</a>命令构建共享库而不是静态库</td>
+  </tr>
+  <tr>
+    <td><a href="file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_EXPORT_COMPILE_COMMANDS.html#variable:CMAKE_EXPORT_COMPILE_COMMANDS">CMAKE_EXPORT_COMPILE_COMMANDS</a></td>
+    <td>使用基于clang的工具生成一个<code>compile_commands.json</code>文件</td>
+  </tr>
+</table>
+
+其他特定于项目的变量可以用于控制构建，例如启用或禁用项目的组件。
+
+对于这些变量如何在不同的构建系统之间命名，CMake没有约定，除了前缀为`CMAKE_`的变量通常引用CMake本身提供的选项，不应该在第三方选项中使用，第三方选项应该使用自己的前缀。[cmake-gui(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-gui.1.html#manual:cmake-gui(1))工具可以显示由前缀定义的组中的选项，因此第三方确保使用自一致的前缀是有意义的。
+
 ### 在命令行设置变量
+
+CMake变量可以在创建初始构建时在命令行中设置：
+
+```shell
+$ mkdir build
+$ cd build
+$ cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Debug
+```
+
+或者稍后调用[cmake(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake.1.html#manual:cmake(1))：
+
+```shell
+$ cd build
+$ cmake . -DCMAKE_BUILD_TYPE=Debug
+```
+
+`-U`标志可以用来在[cmake(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake.1.html#manual:cmake(1))命令行中取消变量的设置：
+
+```shell
+$ cd build
+$ cmake . -UMyPackage_DIR
+```
+
+最初在命令行上创建的CMake构建系统可以使用[cmake-gui(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-gui.1.html#manual:cmake-gui(1))进行修改，反之亦然。
+
+[cmake(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake.1.html#manual:cmake(1))工具允许使用`-C`选项指定一个用来填充初始缓存的文件。这对于简化重复需要相同缓存项的命令和脚本非常有用。
 
 ### 在cmake-gui设置变量
 
+变量可以在cmake-gui中使用“Add Entry”按钮进行设置。这会触发一个新的对话框来设置变量的值。
+
+![编辑一个缓存项](file:///C:/Program%20Files/CMake/doc/cmake/html/_images/GUI-Add-Entry.png)
+
+[cmake-gui(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-gui.1.html#manual:cmake-gui(1))用户界面的主视图可以用来编辑现有的变量。
+
 ### CMake缓存
+
+当CMake执行时，它需要找到编译器、工具和依赖项的位置。它还需要能够一致地重新生成构建系统，以使用相同的编译/链接标志和依赖项路径。用户还需要配置这些参数，因为它们是特定于用户系统的路径和选项。
+
+当它第一次被执行时，CMake会在构建目录中生成一个`CMakeCache.txt`文件，其中包含此类工件的键值对。用户可以通过运行[cmake-gui(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-gui.1.html#manual:cmake-gui(1))或[ccmake(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/ccmake.1.html#manual:ccmake(1))工具查看或编辑缓存文件。这些工具提供了一个交互界面，用于重新配置所提供的软件并重新生成构建系统，这是在编辑缓存值之后所需要的。每个缓存条目可能都有一个相关的简短帮助文本，显示在用户界面工具中。
+
+缓存项也可以有一种类型来表示它应该如何在用户界面中显示。例如，`BOOL`类型的缓存条目可以通过用户界面中的复选框进行编辑，`STRING`可以在文本字段中进行编辑，而与`STRING`类似的`FILEPATH`也应该提供一种使用文件对话框定位文件系统路径的方法。一个`STRING`类型的条目可以提供一个允许值的限制列表，然后在[cmake-gui(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-gui.1.html#manual:cmake-gui(1))用户界面的下拉菜单中提供(参见[STRING](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_cache/STRINGS.html#prop_cache:STRINGS)缓存属性)。
+
+软件包附带的CMake文件也可以使用[option()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/option.html#command:option)命令定义布尔切换选项。该命令创建一个缓存条目，该条目具有帮助文本和默认值。这类缓存条目通常特定于所提供的软件，并影响构建的配置，例如是否构建测试和示例，是否启用异常构建等。
 
 ## 预设
 
