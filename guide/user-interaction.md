@@ -221,9 +221,47 @@ $ cmake . -UMyPackage_DIR
 
 ## 预设
 
+CMake理解一个文件，`CMakePresets.json`，以及它的用户特定对等体`CMakeUserPresets.json`，用于保存常用配置设置的预设。这些预设可以设置构建目录、生成器、缓存变量、环境变量和其他命令行选项。所有这些选项都可以被用户覆盖。`CMakePresets.json`格式的详细信息在[cmake-presets(7)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-presets.7.html#manual:cmake-presets(7))手册中列出。
+
 ### 在命令行使用预设
 
+当使用[cmake(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake.1.html#manual:cmake(1))命令行工具时，可以使用`——preset`选项来调用预置。如果指定了`——preset`，则不需要生成器和构建目录，但可以指定以覆盖它们。例如，如果您有以下`CMakePresets.json`文件:
+
+```json
+{
+  "version": 1,
+  "configurePresets": [
+    {
+      "name": "ninja-release",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ]
+}
+```
+
+然后运行以下命令:
+
+```shell
+cmake -S /path/to/source --preset=ninja-release
+```
+
+这将使用[Ninja](file:///C:/Program%20Files/CMake/doc/cmake/html/generator/Ninja.html#generator:Ninja)生成器在`/path/to/source/build/ninja-release`中生成一个构建目录，并将[CMAKE_BUILD_TYPE](file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_BUILD_TYPE.html#variable:CMAKE_BUILD_TYPE)设置为`Release`。
+
+如果你想查看可用预设的列表，你可以运行:
+
+```shell
+cmake -S /path/to/source --list-presets
+```
+
+这将列出`/path/to/source/CMakePresets.json`及`/path/to/source/CMakeUsersPresets.json`中可用的预设，而不是生成构建树。
+
 ### 在cmake-gui使用预设
+
+如果一个项目有可用的预设，包括`CMakePresets.json`或`CMakeUserPresets.json`，预设列表将出现在[cmake-gui(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-gui.1.html#manual:cmake-gui(1))的下拉菜单中，在源目录和二进制目录之间。选择预置会设置二进制目录、生成器、环境变量和缓存变量，但是在选择预置之后，可以覆盖所有这些选项。
 
 ## 调用构建系统
 
