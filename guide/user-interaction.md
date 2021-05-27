@@ -265,9 +265,153 @@ cmake -S /path/to/source --list-presets
 
 ## 调用构建系统
 
+生成构建系统之后，可以通过调用特定的构建工具来构建软件。在IDE生成器的情况下，这可能涉及将生成的项目文件加载到IDE中以调用构建。
+
+CMake知道调用构建所需的特定构建工具，所以一般来说，要在生成后从命令行构建构建系统或项目，可以在构建目录中调用以下命令：
+
+```shell
+$ cmake --build .
+```
+
+——build标志为cmake(1)工具启用特定的操作模式。
+它调用与生成器相关的CMAKE_MAKE_PROGRAM命令，或者用户配置的构建工具。
+
+——build模式还接受参数——target来指定要构建的特定目标，例如特定库、可执行或自定义目标，或特定的特殊目标，如install：
+
+```shell
+$ cmake --build . --target myexe
+```
+
+在多配置生成器的情况下，——build模式也接受——config参数来指定要构建的特定配置：
+
+```shell
+$ cmake --build . --target myexe --config Release
+```
+
+如果生成器生成一个特定于使用CMAKE_BUILD_TYPE变量调用cmake时所选择的配置的构建系统，则——config选项无效。
+
+一些构建系统忽略了构建过程中调用的命令行细节。verbose标志可以用来显示这些命令行：
+
+```shell
+$ cmake --build . --target myexe --verbose
+```
+
+通过在——之后列出特定的命令行选项，——build模式还可以将特定的命令行选项传递给底层构建工具。这对于为构建工具指定选项很有用，比如在作业失败后继续构建，而CMake不提供高级用户界面。
+
+对于所有生成器，在调用CMake之后都可以运行底层构建工具。例如，make可能在使用Unix Makefiles生成器生成后执行，以调用构建，或者ninja在使用ninja生成器生成后执行。IDE构建系统通常为构建项目提供命令行工具，该项目也可以被调用。
+
 ### 选择一个目标
 
+CMake文件中描述的每个可执行文件和库都是一个构建目标，构建系统可以描述定制的目标，要么供内部使用，要么供用户使用，例如用于创建文档。
+
+CMake为提供CMake文件的所有构建系统提供了一些内置目标。
+
+`all`
+
+`Makefile`和`Ninja`生成器使用的默认目标。构建构建系统中的所有目标，除了那些被它们的[EXCLUDE_FROM_ALL](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_tgt/EXCLUDE_FROM_ALL.html#prop_tgt:EXCLUDE_FROM_ALL)目标属性或[EXCLUDE_FROM_ALL](file:///C:/Program%20Files/CMake/doc/cmake/html/prop_dir/EXCLUDE_FROM_ALL.html#prop_dir:EXCLUDE_FROM_ALL)目录属性排除的目标。名称`ALL_BUILD`用于Xcode和Visual Studio生成器。
+
+`help`
+
+列出可用于生成的目标。当使用[Unix Makefiles](file:///C:/Program%20Files/CMake/doc/cmake/html/generator/Unix%20Makefiles.html#generator:Unix%20Makefiles)或[Ninja](file:///C:/Program%20Files/CMake/doc/cmake/html/generator/Ninja.html#generator:Ninja)生成器时，可以使用此目标，并且确切的输出是特定于工具的。
+
+`clean`
+
+删除已构建的目标文件和其他输出文件。基于`Makefile`的生成器为每个目录创建一个`clean`目标，以便可以清理单个目录。`Ninja`工具提供了自己的颗粒`-t clean`系统。
+
+`test`
+
+运行测试。只有在CMake文件提供基于CTest的测试时，此目标才自动可用。请参见[运行测试](#运行测试)。
+
+`install`
+
+安装软件。这个目标只有在软件使用[install()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/install.html#command:install)命令定义安装规则时才自动可用。请参见[软件安装](#软件安装)。
+
+`package`
+
+创建一个二进制包。这个目标只有在CMake文件提供基于CPack的包时才自动可用。
+
+`package_source`
+
+创建源包。这个目标只有在CMake文件提供基于CPack的包时才自动可用。
+
+对于基于`Makefile`的系统，提供了二进制构建目标的`/fast`变体。`/fast`变量用于构建指定的目标，而不考虑其依赖关系。不检查依赖项，如果过期也不会重新生成依赖项。[Ninja](file:///C:/Program%20Files/CMake/doc/cmake/html/generator/Ninja.html#generator:Ninja)生成器在检查依赖项时速度足够快，以确保没有为该生成器提供此类目标。
+
+基于`Makefile`的系统还提供构建目标来预处理、组装和编译特定目录中的单个文件。
+
+```shell
+$ make foo.cpp.i
+$ make foo.cpp.s
+$ make foo.cpp.o
+```
+
+文件扩展名内置到目标名称中，因为可能存在另一个具有相同名称但扩展名不同的文件。但是，还提供了没有文件扩展名的构建目标。
+
+```shell
+$ make foo.i
+$ make foo.s
+$ make foo.o
+```
+
+在包含`foo.c`和`foo.cpp`的构建系统中，构建`foo.i`将预处理这两个文件。
+
 ### 指定一个构建程序
+
+`——build`模式调用的程序由[CMAKE_MAKE_PROGRAM](file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_MAKE_PROGRAM.html#variable:CMAKE_MAKE_PROGRAM)变量决定。对于大多数生成器，不需要配置特定的程序。
+
+<table>
+  <tr>
+    <th>生成器</th>
+    <th>默认构建程序</th>
+    <th>别名</th>
+  </tr>
+  <tr>
+    <td>XCode</td>
+    <td><code>xcodebuild</code></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Unix Makefiles</td>
+    <td><code>make</code></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>NMake Makefiles</td>
+    <td><code>nmake</code></td>
+    <td><code>jom</code></td>
+  </tr>
+  <tr>
+    <td>NMake Makefiles JOM</td>
+    <td><code>jom</code></td>
+    <td><code>nmake</code></td>
+  </tr>
+  <tr>
+    <td>MinGW Makefiles</td>
+    <td><code>mingw32-make</code></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>MSYS Makefiles</td>
+    <td><code>make</code></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Ninja</td>
+    <td><code>ninja</code></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Visual Studio</td>
+    <td><code>msbuild</code></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Watcom WMake</td>
+    <td><code>wmake</code></td>
+    <td></td>
+  </tr>
+</table>
+
+`jom`工具能够读取`NMake`风格的makefile并并行构建，而`nmake`工具总是串行构建。在使用[NMake Makefiles](file:///C:/Program%20Files/CMake/doc/cmake/html/generator/NMake%20Makefiles.html#generator:NMake%20Makefiles)生成器生成后，用户可以运行`jom`而不是`nmake`。如果在使用[NMake Makefiles](file:///C:/Program%20Files/CMake/doc/cmake/html/generator/NMake%20Makefiles.html#generator:NMake%20Makefiles)生成器时将[CMAKE_MAKE_PROGRAM](file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_MAKE_PROGRAM.html#variable:CMAKE_MAKE_PROGRAM)设置为`jom`，`——build`模式也将使用`jom`，为了方便起见，提供了[NMake Makefiles JOM](file:///C:/Program%20Files/CMake/doc/cmake/html/generator/NMake%20Makefiles%20JOM.html#generator:NMake%20Makefiles%20JOM)生成器以正常方式查找`jom`，并将其作为[CMAKE_MAKE_PROGRAM](file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_MAKE_PROGRAM.html#variable:CMAKE_MAKE_PROGRAM)使用。为了完整起见，`nmake`是一种替代工具，它可以处理[NMake Makefiles JOM](file:///C:/Program%20Files/CMake/doc/cmake/html/generator/NMake%20Makefiles%20JOM.html#generator:NMake%20Makefiles%20JOM)生成器的输出，但这会造就悲观。
 
 ## 软件安装
 
