@@ -415,4 +415,40 @@ $ make foo.o
 
 ## 软件安装
 
+可以在CMake缓存中设置[CMAKE_INSTALL_PREFIX](file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_INSTALL_PREFIX.html#variable:CMAKE_INSTALL_PREFIX)变量，以指定在何处安装所提供的软件。如果提供的软件具有使用[install()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/install.html#command:install)命令指定的安装规则，它们将把工件安装到该前缀中。在Windows上，默认安装位置对应于`ProgramFile`s系统目录，该目录可能是特定于体系结构的。在Unix主机上，`/usr/local`是默认的安装位置。
+
+[CMAKE_INSTALL_PREFIX](file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_INSTALL_PREFIX.html#variable:CMAKE_INSTALL_PREFIX)变量总是指向目标文件系统上的安装前缀。
+
+在交叉编译或打包的场景中，sysroot是只读的，或者sysroot应该保持原始状态，可以将[CMAKE_STAGING_PREFIX](file:///C:/Program%20Files/CMake/doc/cmake/html/variable/CMAKE_STAGING_PREFIX.html#variable:CMAKE_STAGING_PREFIX)变量设置为实际安装文件的位置。
+
+这些命令：
+
+```console
+$ cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+  -DCMAKE_SYSROOT=$HOME/root \
+  -DCMAKE_STAGING_PREFIX=/tmp/package
+$ cmake --build .
+$ cmake --build . --target install
+```
+
+导致文件被安装到机器的`/tmp/package/lib/libfoo.so`等路径下。机器上的`/usr/local`位置不受影响。
+
+一些提供的软件可能会指定`uninstall`规则，但CMake本身默认不生成这样的规则。
+
 ## 运行测试
+
+```console
+$ ctest
+```
+
+```console
+$ ctest -R Qt
+```
+
+```console
+$ ctest -E Qt
+```
+
+```console
+$ ctest -R Qt -j8
+```
