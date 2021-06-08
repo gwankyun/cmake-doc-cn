@@ -6,7 +6,7 @@ CMake中文文檔
 
 - CMake Tutorial：已完成。
 - Importing and Exporting Guide：已完成。
-- User Interaction Guide：正在翻譯。
+- User Interaction Guide：已完成。
 
 文檔中的鏈接指向安裝在`C:\Program Files\CMake`的本地文檔。
 

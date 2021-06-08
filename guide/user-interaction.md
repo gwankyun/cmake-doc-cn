@@ -67,7 +67,7 @@ CMake根据平台默认选择一个生成器。通常，默认生成器足以允
 
 用户可以使用`-G`选项覆盖默认生成器：
 
-```shell
+```console
 $ cmake .. -G Ninja
 ```
 
@@ -79,7 +79,7 @@ $ cmake .. -G Ninja
 
 在Windows上，可以使用[cmake(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake.1.html#manual:cmake(1))为Visual Studio IDE生成解决方案。Visual Studio版本可以通过IDE的产品名来指定，其中包含一个四位数字的年份。别名也可以用来表示Visual Studio版本，比如两个数字对应于visualc++编译器的产品版本，或者两者的组合：
 
-```shell
+```console
 $ cmake .. -G "Visual Studio 2019"
 $ cmake .. -G "Visual Studio 16"
 $ cmake .. -G "Visual Studio 16 2019"
@@ -87,7 +87,7 @@ $ cmake .. -G "Visual Studio 16 2019"
 
 Visual Studio生成器可以针对不同的架构。可以使用 *-A* 选项指定目标架构：
 
-```shell
+```console
 cmake .. -G "Visual Studio 2019" -A x64
 cmake .. -G "Visual Studio 16" -A ARM
 cmake .. -G "Visual Studio 16 2019" -A ARM64
@@ -103,7 +103,7 @@ cmake .. -G "Visual Studio 16 2019" -A ARM64
 
 Visual Studio工具集可以通过`-T`选项来指定：
 
-```shell
+```console
 $ # Build with the clang-cl toolset
 $ cmake.exe .. -G "Visual Studio 16 2019" -A x64 -T ClangCL
 $ # Build targeting Windows XP
@@ -112,7 +112,7 @@ $ cmake.exe .. -G "Visual Studio 16 2019" -A x64 -T v120_xp
 
 `-A`选项指定_target_体系结构，而`-T`选项可用于指定所使用的工具链的详细信息。例如，可以使用 *-Thost=x64* 来选择64位版本的主机工具。下面演示了如何使用64位工具，以及如何构建64位目标体系结构：
 
-```shell
+```console
 $ cmake .. -G "Visual Studio 16 2019" -A x64 -Thost=x64
 ```
 
@@ -177,7 +177,7 @@ $ cmake .. -G "Visual Studio 16 2019" -A x64 -Thost=x64
 
 CMake变量可以在创建初始构建时在命令行中设置：
 
-```shell
+```console
 $ mkdir build
 $ cd build
 $ cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Debug
@@ -185,14 +185,14 @@ $ cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Debug
 
 或者稍后调用[cmake(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake.1.html#manual:cmake(1))：
 
-```shell
+```console
 $ cd build
 $ cmake . -DCMAKE_BUILD_TYPE=Debug
 ```
 
 `-U`标志可以用来在[cmake(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake.1.html#manual:cmake(1))命令行中取消变量的设置：
 
-```shell
+```console
 $ cd build
 $ cmake . -UMyPackage_DIR
 ```
@@ -245,7 +245,7 @@ CMake理解一个文件，`CMakePresets.json`，以及它的用户特定对等�
 
 然后运行以下命令:
 
-```shell
+```console
 cmake -S /path/to/source --preset=ninja-release
 ```
 
@@ -253,7 +253,7 @@ cmake -S /path/to/source --preset=ninja-release
 
 如果你想查看可用预设的列表，你可以运行:
 
-```shell
+```console
 cmake -S /path/to/source --list-presets
 ```
 
@@ -269,7 +269,7 @@ cmake -S /path/to/source --list-presets
 
 CMake知道调用构建所需的特定构建工具，所以一般来说，要在生成后从命令行构建构建系统或项目，可以在构建目录中调用以下命令：
 
-```shell
+```console
 $ cmake --build .
 ```
 
@@ -278,13 +278,13 @@ $ cmake --build .
 
 ——build模式还接受参数——target来指定要构建的特定目标，例如特定库、可执行或自定义目标，或特定的特殊目标，如install：
 
-```shell
+```console
 $ cmake --build . --target myexe
 ```
 
 在多配置生成器的情况下，——build模式也接受——config参数来指定要构建的特定配置：
 
-```shell
+```console
 $ cmake --build . --target myexe --config Release
 ```
 
@@ -292,7 +292,7 @@ $ cmake --build . --target myexe --config Release
 
 一些构建系统忽略了构建过程中调用的命令行细节。verbose标志可以用来显示这些命令行：
 
-```shell
+```console
 $ cmake --build . --target myexe --verbose
 ```
 
@@ -338,7 +338,7 @@ CMake为提供CMake文件的所有构建系统提供了一些内置目标。
 
 基于`Makefile`的系统还提供构建目标来预处理、组装和编译特定目录中的单个文件。
 
-```shell
+```console
 $ make foo.cpp.i
 $ make foo.cpp.s
 $ make foo.cpp.o
@@ -346,7 +346,7 @@ $ make foo.cpp.o
 
 文件扩展名内置到目标名称中，因为可能存在另一个具有相同名称但扩展名不同的文件。但是，还提供了没有文件扩展名的构建目标。
 
-```shell
+```console
 $ make foo.i
 $ make foo.s
 $ make foo.o
@@ -437,18 +437,30 @@ $ cmake --build . --target install
 
 ## 运行测试
 
+[ctest(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/ctest.1.html#manual:ctest(1))工具随CMake发行版一起提供，用于执行所提供的测试并报告结果。尽管提供了`test`构建目标以运行所有可用的测试，但[ctest(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/ctest.1.html#manual:ctest(1))工具也允许对运行哪些测试、如何运行它们以及如何报告结果进行细粒度控制。在构建目录中执行[ctest(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/ctest.1.html#manual:ctest(1))相当于运行`test`目标：
+
 ```console
 $ ctest
 ```
+
+可以传递正则表达式来只运行与该表达式匹配的测试。只运行以`Qt`命名的测试：
 
 ```console
 $ ctest -R Qt
 ```
 
+正则表达式也可以排除测试。只运行名称中没有`Qt`的测试：
+
 ```console
 $ ctest -E Qt
 ```
 
+通过向[ctest(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/ctest.1.html#manual:ctest(1))传递`-j`参数，测试可以并行运行：
+
 ```console
 $ ctest -R Qt -j8
 ```
+
+也可以设置环境变量[CTEST_PARALLEL_LEVEL](file:///C:/Program%20Files/CMake/doc/cmake/html/envvar/CTEST_PARALLEL_LEVEL.html#envvar:CTEST_PARALLEL_LEVEL)以避免传递`-j`。
+
+默认情况下，[ctest(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/ctest.1.html#manual:ctest(1))不打印测试的输出。命令行参数`-V`(或`——verbose`)启用verbose模式以打印所有测试的输出。`——output-on-failure`选项仅打印失败测试的测试输出。可以将环境变量[CTEST_OUTPUT_ON_FAILURE](file:///C:/Program%20Files/CMake/doc/cmake/html/envvar/CTEST_OUTPUT_ON_FAILURE.html#envvar:CTEST_OUTPUT_ON_FAILURE)设置为`1`，作为将`——output-on-failure`选项传递给[ctest(1)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/ctest.1.html#manual:ctest(1))的替代方法。
