@@ -24,13 +24,30 @@
 
 [调用CMake](user-interaction.md)的目的是使用第三方二进制文件包，需要CMake的[find_package()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/find_package.html#command:find_package)命令成功找到包。若包位于CMake的已知目录，那[find_package()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/find_package.html#command:find_package)调用应该成功。这些已知的cmake目录跟平台相关。例如，使用标准系统包管理器安装在Linux上的包将自动在`/usr`前缀中找到。类似的，Windows上，将会自动找到安装在`Program Files`中的软件包。
 
-无法自动找到的包位于CMake无法预测的位置，例如`/opt/mylib`或`$HOME/dev/prefix`。这是一种常见的情况，CMake为用户提供了几种方法来指定在哪里找到这些库。
+那些无法自动找到的包通常位于CMake无法预测的位置，例如`/opt/mylib`或`$HOME/dev/prefix`。这是一种常见的情况，CMake为用户提供了几种方法来指定在哪里找到这些库。
 
-在[调用CMake](user-interaction.md)时，可以设置[CMAKE_PREFIX_PATH]([CMAKE_PREFIX_PATH — CMake 3.20.4 Documentation](file:///C:/Program Files/CMake/doc/cmake/html/variable/CMAKE_PREFIX_PATH.html#variable:CMAKE_PREFIX_PATH))变量。它被视为搜索[配置文件包]([cmake-packages(7) — CMake 3.20.4 Documentation](file:///C:/Program Files/CMake/doc/cmake/html/manual/cmake-packages.7.html#config-file-packages))的路径列表。安装在`/opt/somepackage`中的包通常会安装配置文件，例如`/opt/somepackage/lib/cmake/ somepackage/SomePackageConfig.cmake`。在这种情况下，应该将`/opt/some`包添加到[CMAKE_PREFIX_PATH]([CMAKE_PREFIX_PATH — CMake 3.20.4 Documentation](file:///C:/Program Files/CMake/doc/cmake/html/variable/CMAKE_PREFIX_PATH.html#variable:CMAKE_PREFIX_PATH))中。
+在[调用CMake](user-interaction.md)时，可以设置[CMAKE_PREFIX_PATH](file:///C:/Program Files/CMake/doc/cmake/html/variable/CMAKE_PREFIX_PATH.html#variable:CMAKE_PREFIX_PATH)变量。它被视为搜索[配置文件包](file:///C:/Program Files/CMake/doc/cmake/html/manual/cmake-packages.7.html#config-file-packages)的路径列表。安装在`/opt/somepackage`中的包通常会安装配置文件，例如`/opt/somepackage/lib/cmake/ somepackage/SomePackageConfig.cmake`。在这种情况下，应该将`/opt/some`包添加到[CMAKE_PREFIX_PATH](file:///C:/Program Files/CMake/doc/cmake/html/variable/CMAKE_PREFIX_PATH.html#variable:CMAKE_PREFIX_PATH)中。
 
 也可以用前缀填充环境变量`CMAKE_PREFIX_PATH`来搜索包。与`PATH`环境变量一样，这是一个列表，需要使用特定于平台的环境变量列表项分隔符（`:`在Unix和`;`在Windows上）。
 
 ## 从包中导入目标
+
+提供配置文件包的第三方包也可以提供[导入的目标](importing-exporting.md)。这些将在包含与包相关的特定于配置的文件路径的文件中指定，例如库的调试和发布版本。
+
+第三方包文档通常会指出在成功地为库导入`find_package`之后可用的导入目标的名称。这些导入的目标名称可以与[target_link_libraries()](file:///C:/Program%20Files/CMake/doc/cmake/html/command/target_link_libraries.html#command:target_link_libraries)命令一起使用。
+
+一个简单使用第三方库的完整示例如下：
+
+```cmake
+cmake_minimum_required(VERSION 3.10)
+project(MyExeProject VERSION 1.0.0)
+
+find_package(SomePackage REQUIRED)
+add_executable(MyExe main.cpp)
+target_link_libraries(MyExe PRIVATE SomePrefix::LibName)
+```
+
+关于开发CMake构建系统的更多信息，请参见[cmake-buildsystem(7)](file:///C:/Program%20Files/CMake/doc/cmake/html/manual/cmake-buildsystem.7.html#manual:cmake-buildsystem(7))。
 
 ### 库不提供配置文件包
 
